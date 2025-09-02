@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/orangeMangoDimz/go-social/internal/env"
+	"github.com/orangeMangoDimz/go-social/store"
 )
 
 func main() {
@@ -11,6 +12,7 @@ func main() {
 		config: config{
 			addr: env.GetString("ADDR", ":8000"),
 		},
+		store: store.NewStore(nil),
 	}
 
 	mux := app.mount()
