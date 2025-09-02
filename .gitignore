@@ -1,0 +1,36 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when run with the
+# -o option to specify an output file.
+*.out
+
+# Project-local directory containing vendor-ed dependencies.
+/vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Environment variables
+.env
+.env.*
+.envrc
+!.env.example
+
+# IDE/Editor directories
+.idea/
+.vscode/
+*.swp
+*~
+
+# Other
+temp.txt
+tmp
