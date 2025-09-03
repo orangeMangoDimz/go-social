@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
@@ -54,16 +55,25 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
-	idParm := chi.URLParam(r, "postID")
-	id, err := strconv.ParseInt(idParm, 10, 64)
+	post := getPostFromContext(r)
+	if post == nil {
+		app.notFoundResponse(w, r, errors.New("post not found"))
+		return
+	}
+
+	comment, err := app.store.Comments.GetByPostID(r.Context(), post.ID)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
-	ctx := r.Context()
 
-	post, err := app.store.Posts.GetById(ctx, id)
-	if err != nil {
+	post.Comments = comment
+	if err := writeJSON(w, http.StatusOK, post); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
+
 type UpdatePostPayload struct {
 	Title   *string `json:"title" validate:"omitempty,max=100"`
 	Content *string `json:"content" validate:"omitempty,max=1000"`
