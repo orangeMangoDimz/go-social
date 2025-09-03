@@ -80,12 +80,29 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post.Comments = comment
+func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
+	post := getPostFromContext(r)
+	if post == nil {
+		app.notFoundResponse(w, r, errors.New("post not found"))
+		return
+	}
 
-	if err := writeJSON(w, http.StatusOK, post); err != nil {
+	if err := app.store.Posts.Delete(r.Context(), post.ID); err != nil {
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.notFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+
+	if err := writeJSON(w, http.StatusNoContent, nil); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
 }
+
 func (app *application) postContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		idParm := chi.URLParam(r, "postID")
