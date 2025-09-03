@@ -64,6 +64,37 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	post, err := app.store.Posts.GetById(ctx, id)
 	if err != nil {
+type UpdatePostPayload struct {
+	Title   *string `json:"title" validate:"omitempty,max=100"`
+	Content *string `json:"content" validate:"omitempty,max=1000"`
+}
+
+func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
+	post := getPostFromContext(r)
+	if post == nil {
+		app.notFoundResponse(w, r, errors.New("post not found"))
+		return
+	}
+
+	var payload UpdatePostPayload
+	if err := readJSON(w, r, &payload); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	if err := validate.Struct(payload); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	if payload.Title != nil {
+		post.Title = *payload.Title
+	}
+	if payload.Content != nil {
+		post.Content = *payload.Content
+	}
+
+	if err := app.store.Posts.Update(r.Context(), post); err != nil {
 		switch {
 		case errors.Is(err, store.ErrNotFound):
 			app.notFoundResponse(w, r, err)
@@ -73,13 +104,12 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	comment, err := app.store.Comments.GetByPostID(ctx, id)
-	if err != nil {
+	if err := writeJSON(w, http.StatusOK, post); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
+}
 
-	post.Comments = comment
 func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)
 	if post == nil {
