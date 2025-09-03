@@ -9,6 +9,10 @@ import (
 	"github.com/orangeMangoDimz/go-social/store"
 )
 
+type postKey string
+
+const postCtx postKey = "post"
+
 type CreatePOstPayload struct {
 	Title   string   `json:"title" validate:"required,max=100"`
 	Content string   `json:"content" validate:"required,max=1000"`
@@ -81,4 +85,37 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 		app.internalServerError(w, r, err)
 		return
 	}
+}
+func (app *application) postContextMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		idParm := chi.URLParam(r, "postID")
+		id, err := strconv.ParseInt(idParm, 10, 64)
+		if err != nil {
+			app.internalServerError(w, r, err)
+			return
+		}
+		ctx := r.Context()
+
+		post, err := app.store.Posts.GetById(ctx, id)
+		if err != nil {
+			switch {
+			case errors.Is(err, store.ErrNotFound):
+				app.notFoundResponse(w, r, err)
+			default:
+				app.internalServerError(w, r, err)
+			}
+			return
+		}
+
+		ctx = context.WithValue(ctx, postCtx, post)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func getPostFromContext(r *http.Request) *store.Post {
+	post, ok := r.Context().Value(postCtx).(*store.Post)
+	if !ok {
+		return nil
+	}
+	return post
 }
