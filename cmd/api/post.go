@@ -82,7 +82,7 @@ type UpdatePostPayload struct {
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)
 	if post == nil {
-		app.notFoundResponse(w, r, errors.New("post not found"))
+		app.notFoundResponse(w, r, store.ErrNotFound)
 		return
 	}
 
@@ -123,7 +123,7 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)
 	if post == nil {
-		app.notFoundResponse(w, r, errors.New("post not found"))
+		app.notFoundResponse(w, r, store.ErrNotFound)
 		return
 	}
 
