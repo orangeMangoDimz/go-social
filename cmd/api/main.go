@@ -8,6 +8,8 @@ import (
 	"github.com/orangeMangoDimz/go-social/store"
 )
 
+const VERSION = "0.0.1"
+
 func main() {
 	cfg := dbConfig{
 		addr:         env.GetString("DB_ADDR", "postgres://postgres:root@localhost/social?sslmode=disable"),
@@ -28,6 +30,7 @@ func main() {
 		config: config{
 			addr: env.GetString("ADDR", ":8000"),
 			db:   cfg,
+			env:  env.GetString("ENV", "development"),
 		},
 		store: store.NewStore(db),
 	}
