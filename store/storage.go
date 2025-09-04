@@ -19,6 +19,7 @@ type Storage struct {
 		Delete(context.Context, int64) error
 		Create(context.Context, *Post) error
 		Update(context.Context, *Post) error
+		GetUserFeed(context.Context, int64) ([]Feed, error)
 	}
 	Users interface {
 		GetById(context.Context, int64) (*User, error)
@@ -30,6 +31,7 @@ type Storage struct {
 	}
 	Followers interface {
 		Follow(ctx context.Context, followedID, userID int64) error
+		Unfollow(ctx context.Context, followedID, userID int64) error
 	}
 }
 
