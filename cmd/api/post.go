@@ -79,6 +79,24 @@ type UpdatePostPayload struct {
 	Content *string `json:"content" validate:"omitempty,max=1000"`
 }
 
+func (app *application) getUserPostFeed(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	userID := 1
+
+	feed, err := app.store.Posts.GetUserFeed(ctx, int64(userID))
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, feed); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+}
+
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)
 	if post == nil {
