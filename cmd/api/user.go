@@ -28,9 +28,43 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type FollowUser struct {
+	UserID int64 `json:"user_id"`
+}
 
+func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("test")
+	// user to follow
+	followerUser := getUserFromContext(r)
+	if followerUser == nil {
+		app.notFoundResponse(w, r, store.ErrNotFound)
+		return
+	}
 
+	// Revert from ctx
+	var payload FollowUser
+	if err := readJSON(w, r, &payload); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
 
+	ctx := r.Context()
+
+	if err := app.store.Followers.Follow(ctx, followerUser.ID, payload.UserID); err != nil {
+		switch {
+		case errors.Is(err, store.ErrUniqueViolation):
+			app.conflictResponse(w, r, errors.New("YOU HAVE FOLLOWED THIS USER"))
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusNoContent, nil); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
 
 func (app *application) userContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
