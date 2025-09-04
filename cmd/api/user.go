@@ -66,6 +66,39 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Request) {
+	// user to follow
+	unfollowedUser := getUserFromContext(r)
+	if unfollowedUser == nil {
+		app.notFoundResponse(w, r, store.ErrNotFound)
+		return
+	}
+
+	// Revert from ctx
+	var payload FollowUser
+	if err := readJSON(w, r, &payload); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	ctx := r.Context()
+
+	if err := app.store.Followers.Unfollow(ctx, unfollowedUser.ID, payload.UserID); err != nil {
+		switch {
+		case errors.Is(err, store.ErrUniqueViolation):
+			app.conflictResponse(w, r, errors.New("YOU HAVE UNFOLLOWED THIS USER"))
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusNoContent, nil); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
+
 func (app *application) userContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		idParm := chi.URLParam(r, "userID")
