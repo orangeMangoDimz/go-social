@@ -11,6 +11,7 @@ var (
 	ErrNotFound          = errors.New("RESOURCE NOT FOUND")
 	QueryTimeoutDuration = time.Second * 5
 	ErrUniqueViolation   = errors.New("DUPLICATE UNIQUE RECORDS")
+	InitSinceTime        = "2025-01-01 00:00:00"
 )
 
 type Storage struct {
@@ -19,7 +20,7 @@ type Storage struct {
 		Delete(context.Context, int64) error
 		Create(context.Context, *Post) error
 		Update(context.Context, *Post) error
-		GetUserFeed(context.Context, int64) ([]Feed, error)
+		GetUserFeed(context.Context, int64, PaginatedQuery) ([]Feed, error)
 	}
 	Users interface {
 		GetById(context.Context, int64) (*User, error)

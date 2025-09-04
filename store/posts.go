@@ -30,7 +30,7 @@ type PostStore struct {
 	db *sql.DB
 }
 
-func (s *PostStore) GetUserFeed(ctx context.Context, userID int64) ([]Feed, error) {
+func (s *PostStore) GetUserFeed(ctx context.Context, userID int64, fq PaginatedQuery) ([]Feed, error) {
 	query := `
 		SELECT
 			p.id, p.user_id, p.title, p.content, p.created_at, p.tags,
@@ -40,9 +40,15 @@ func (s *PostStore) GetUserFeed(ctx context.Context, userID int64) ([]Feed, erro
 		LEFT JOIN comments c ON c.post_id = p.id
 		LEFT JOIN users u ON p.user_id = u.id
 		JOIN followers f ON f.follower_id = p.user_id OR p.user_id = $1
-		WHERE f.user_id = $1 OR p.user_id = $1
+		WHERE 
+			(f.user_id = $1 OR p.user_id = $1) AND
+			(p.title ILIKE '%' || $4 || '%' OR p.content ILIKE '%' || $4 || '%') AND
+			(p.tags @> $5 OR $5 = '{}') AND
+			(p.created_at >= $6 AND p.created_at <= $7)
 		GROUP BY p.id, u.username
-		ORDER BY p.created_at DESC;
+		ORDER BY p.created_at ` + fq.Sort + `
+		LIMIT $2
+		OFFSET $3
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -52,6 +58,12 @@ func (s *PostStore) GetUserFeed(ctx context.Context, userID int64) ([]Feed, erro
 		ctx,
 		query,
 		userID,
+		fq.Limit,
+		fq.Offset,
+		fq.Search,
+		pq.Array(fq.Tags),
+		fq.Since,
+		fq.Until,
 	)
 
 	if err != nil {

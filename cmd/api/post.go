@@ -80,11 +80,28 @@ type UpdatePostPayload struct {
 }
 
 func (app *application) getUserPostFeed(w http.ResponseWriter, r *http.Request) {
+	fq := store.PaginatedQuery{
+		Limit:  20,
+		Offset: 0,
+		Sort:   "desc",
+	}
+
+	fq, err := fq.Parse(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	if err := validate.Struct(fq); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
 	ctx := r.Context()
 
 	userID := 1
 
-	feed, err := app.store.Posts.GetUserFeed(ctx, int64(userID))
+	feed, err := app.store.Posts.GetUserFeed(ctx, int64(userID), fq)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return
