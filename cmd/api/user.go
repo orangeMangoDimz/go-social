@@ -144,6 +144,40 @@ func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
+// activateUserHandler activates a user account using the provided token
+//
+//	@Summary		Activate user account
+//	@Description	Activate a user account using the activation token received during registration
+//	@Tags			authentication
+//	@Accept			json
+//	@Produce		json
+//	@Param			token	path	string	true	"Activation token"	example("550e8400-e29b-41d4-a716-446655440000")
+//	@Success		204		"User account activated successfully"
+//	@Failure		404		{object}	map[string]string	"Token not found or invalid"
+//	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Router			/users/activate/{token} [put]
+func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Request) {
+	token := chi.URLParam(r, "token")
+
+	ctx := r.Context()
+
+	if err := app.store.Users.Activate(ctx, token); err != nil {
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.notFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusAccepted, nil); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+}
+
 func (app *application) userContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		idParm := chi.URLParam(r, "userID")

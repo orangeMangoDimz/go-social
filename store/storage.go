@@ -28,6 +28,7 @@ type Storage struct {
 		GetById(context.Context, int64) (*User, error)
 		Create(context.Context, *sql.Tx, *User) error
 		CreateAndInvite(context.Context, *User, string, time.Duration) error
+		Activate(context.Context, string) error
 	}
 	Comments interface {
 		Create(context.Context, *Comment) error
