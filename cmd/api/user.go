@@ -15,6 +15,18 @@ type userKey string
 
 const userCtx userKey = "user"
 
+// getUserHandler retrieves a user by ID
+//
+//	@Summary		Get user by ID
+//	@Description	Get detailed information about a specific user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID	path		int					true	"User ID"	example(1)
+//	@Success		200		{object}	store.User			"User information"
+//	@Failure		404		{object}	map[string]string	"User not found"
+//	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Router			/users/{userID} [get]
 func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := getUserFromContext(r)
 	if user == nil {
@@ -28,10 +40,28 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// FollowUser represents the request payload for following/unfollowing a user
+//
+//	@Description	Request payload for follow/unfollow operations
 type FollowUser struct {
-	UserID int64 `json:"user_id"`
+	UserID int64 `json:"user_id" example:"123" validate:"required"` // User ID to follow/unfollow
 }
 
+// followUserHandler allows a user to follow another user
+//
+//	@Summary		Follow a user
+//	@Description	Follow another user to see their posts in your feed
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID	path	int			true	"ID of the user doing the following"	example(1)
+//	@Param			payload	body	FollowUser	true	"User to follow"
+//	@Success		204		"Successfully followed user"
+//	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		404		{object}	map[string]string	"User not found"
+//	@Failure		409		{object}	map[string]string	"Already following this user"
+//	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Router			/users/{userID}/follow [put]
 func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("test")
 	// user to follow
@@ -66,6 +96,21 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// unfollowUserHandler allows a user to unfollow another user
+//
+//	@Summary		Unfollow a user
+//	@Description	Unfollow a user to stop seeing their posts in your feed
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID	path	int			true	"ID of the user doing the unfollowing"	example(1)
+//	@Param			payload	body	FollowUser	true	"User to unfollow"
+//	@Success		204		"Successfully unfollowed user"
+//	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		404		{object}	map[string]string	"User not found"
+//	@Failure		409		{object}	map[string]string	"Already unfollowed this user"
+//	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Router			/users/{userID}/unfollow [put]
 func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Request) {
 	// user to follow
 	unfollowedUser := getUserFromContext(r)

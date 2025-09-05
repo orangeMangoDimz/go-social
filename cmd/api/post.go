@@ -14,12 +14,27 @@ type postKey string
 
 const postCtx postKey = "post"
 
+// CreatePOstPayload represents the request payload for creating a new post
+//
+//	@Description	Request payload for creating a new post
 type CreatePOstPayload struct {
-	Title   string   `json:"title" validate:"required,max=100"`
-	Content string   `json:"content" validate:"required,max=1000"`
-	Tags    []string `json:"tags"`
+	Title   string   `json:"title" validate:"required,max=100" example:"My First Post"`                     // Post title (max 100 characters)
+	Content string   `json:"content" validate:"required,max=1000" example:"This is the content of my post"` // Post content (max 1000 characters)
+	Tags    []string `json:"tags" example:"golang,programming"`                                             // Post tags
 }
 
+// createPostHandler creates a new post
+//
+//	@Summary		Create a new post
+//	@Description	Create a new post with title, content and optional tags
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		CreatePOstPayload	true	"Post creation data"
+//	@Success		200		{object}	store.Post			"Created post"
+//	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Router			/posts [post]
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	var payload CreatePOstPayload
 
@@ -54,6 +69,18 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// getPostHandler retrieves a post by ID with its comments
+//
+//	@Summary		Get post by ID
+//	@Description	Get detailed information about a specific post including comments
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			postID	path		int					true	"Post ID"	example(1)
+//	@Success		200		{object}	store.Post			"Post information with comments"
+//	@Failure		404		{object}	map[string]string	"Post not found"
+//	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Router			/posts/{postID} [get]
 func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)
 	if post == nil {
@@ -74,11 +101,32 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UpdatePostPayload represents the request payload for updating a post
+//
+//	@Description	Request payload for updating an existing post
 type UpdatePostPayload struct {
-	Title   *string `json:"title" validate:"omitempty,max=100"`
-	Content *string `json:"content" validate:"omitempty,max=1000"`
+	Title   *string `json:"title" validate:"omitempty,max=100" example:"Updated Post Title"`      // Updated post title (max 100 characters)
+	Content *string `json:"content" validate:"omitempty,max=1000" example:"Updated post content"` // Updated post content (max 1000 characters)
 }
 
+// getUserPostFeed retrieves the user's personalized post feed
+//
+//	@Summary		Get user's post feed
+//	@Description	Get a paginated feed of posts from followed users and own posts
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			limit	query		int					false	"Number of posts per page (1-20)"	default(20)		example(10)
+//	@Param			offset	query		int					false	"Number of posts to skip"			default(0)		example(0)
+//	@Param			sort	query		string				false	"Sort order (asc/desc)"				default(desc)	Enums(asc, desc)
+//	@Param			search	query		string				false	"Search in title and content"		example("golang")
+//	@Param			tags	query		string				false	"Comma-separated list of tags"		example("golang,programming")
+//	@Param			since	query		string				false	"Posts created after this date"		example("2024-01-01 00:00:00")
+//	@Param			until	query		string				false	"Posts created before this date"	example("2024-12-31 23:59:59")
+//	@Success		200		{array}		store.Feed			"User's post feed"
+//	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Router			/users/feed [get]
 func (app *application) getUserPostFeed(w http.ResponseWriter, r *http.Request) {
 	fq := store.PaginatedQuery{
 		Limit:  20,
@@ -114,6 +162,20 @@ func (app *application) getUserPostFeed(w http.ResponseWriter, r *http.Request) 
 
 }
 
+// updatePostHandler updates an existing post
+//
+//	@Summary		Update a post
+//	@Description	Update the title and/or content of an existing post
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			postID	path		int					true	"Post ID"	example(1)
+//	@Param			payload	body		UpdatePostPayload	true	"Post update data"
+//	@Success		200		{object}	store.Post			"Updated post"
+//	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		404		{object}	map[string]string	"Post not found"
+//	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Router			/posts/{postID} [patch]
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)
 	if post == nil {
@@ -155,6 +217,18 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// deletePostHandler deletes a post by ID
+//
+//	@Summary		Delete a post
+//	@Description	Delete a specific post by its ID
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			postID	path	int	true	"Post ID"	example(1)
+//	@Success		204		"Post successfully deleted"
+//	@Failure		404		{object}	map[string]string	"Post not found"
+//	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Router			/posts/{postID} [delete]
 func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)
 	if post == nil {

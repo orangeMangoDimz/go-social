@@ -8,22 +8,28 @@ import (
 	"github.com/lib/pq"
 )
 
+// Post represents a social media post
+//
+//	@Description	Social media post with content, tags and metadata
 type Post struct {
-	ID        int64     `json:"id"`
-	Content   string    `json:"content"`
-	Title     string    `json:"title"`
-	UserId    int64     `json:"user_id"`
-	Tags      []string  `json:"tags"`
-	CreatedAt string    `json:"created_at"`
-	UpdatedAt string    `json:"updated_at"`
-	Version   int       `json:"version"`
-	Comments  []Comment `json:"comments"`
-	User      User      `json:"user"`
+	ID        int64     `json:"id" example:"1"`                            // Post ID
+	Content   string    `json:"content" example:"This is my post content"` // Post content
+	Title     string    `json:"title" example:"My First Post"`             // Post title
+	UserId    int64     `json:"user_id" example:"123"`                     // ID of the user who created the post
+	Tags      []string  `json:"tags" example:"golang,programming"`         // Post tags
+	CreatedAt string    `json:"created_at" example:"2024-01-01 12:00:00"`  // Post creation timestamp
+	UpdatedAt string    `json:"updated_at" example:"2024-01-01 12:30:00"`  // Post last update timestamp
+	Version   int       `json:"version" example:"1"`                       // Post version for optimistic locking
+	Comments  []Comment `json:"comments"`                                  // Comments on this post
+	User      User      `json:"user"`                                      // User who created the post
 }
 
+// Feed represents a post in the user's feed with additional metadata
+//
+//	@Description	Post feed item with comment count
 type Feed struct {
 	Post
-	TotalComments int64 `json:"total_comment"`
+	TotalComments int64 `json:"total_comment" example:"5"` // Total number of comments on this post
 }
 
 type PostStore struct {

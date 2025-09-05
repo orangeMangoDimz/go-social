@@ -1,12 +1,20 @@
 package main
 
-import "net/http"
 import (
 	"net/http"
 )
 
+// healthCheckHandler returns the health status of the API
+//
+//	@Summary		Health check endpoint
+//	@Description	Returns the current health status, environment, and version of the API
+//	@Tags			oops
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	map[string]string	"Health status information"
+//	@Failure		500	{object}	map[string]string	"Internal server error"
+//	@Router			/health [get]
 func (app *application) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("hello"))
 	data := map[string]string{
 		"status":  "ok",
 		"env":     app.config.env,

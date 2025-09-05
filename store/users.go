@@ -6,12 +6,15 @@ import (
 	"errors"
 )
 
+// User represents a user in the system
+//
+//	@Description	User account information
 type User struct {
-	ID        int64  `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Password  string `json:"-"`
-	CreatedAt string `json:"created_at"`
+	ID        int64  `json:"id" example:"1"`                           // User ID
+	Username  string `json:"username" example:"johndoe"`               // Username
+	Email     string `json:"email" example:"johndoe@example.com"`      // Email address
+	Password  string `json:"-"`                                        // Password (never returned in responses)
+	CreatedAt string `json:"created_at" example:"2024-01-01 12:00:00"` // Account creation timestamp
 }
 
 type UserStore struct {
