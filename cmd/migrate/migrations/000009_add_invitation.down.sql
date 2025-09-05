@@ -1,0 +1,1 @@
+DROP TABLE IF NOT EXISTS user_invitations;
