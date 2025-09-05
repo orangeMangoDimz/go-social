@@ -1,11 +1,10 @@
 package main
 
 import (
-	"log"
-
 	"github.com/orangeMangoDimz/go-social/internal/db"
 	"github.com/orangeMangoDimz/go-social/internal/env"
 	"github.com/orangeMangoDimz/go-social/store"
+	"go.uber.org/zap"
 )
 
 const VERSION = "0.0.1"
@@ -35,13 +34,18 @@ func main() {
 		maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 	}
 
+	// Logger
+	logger := zap.Must(zap.NewProduction()).Sugar()
+	defer logger.Sync()
+
+	// Database
 	db, err := db.New(cfg.addr, cfg.maxOpenConns, cfg.maxIdleConns, cfg.maxIdleTime)
 	if err != nil {
-		log.Panic(err)
+		logger.Fatal(err)
 	}
 
 	defer db.Close()
-	log.Printf("DB Database connection pool established")
+	logger.Info("DB Database connection pool established")
 
 	app := application{
 		config: config{
@@ -50,9 +54,10 @@ func main() {
 			env:    env.GetString("ENV", "development"),
 			apiURL: env.GetString("EXTERNAL_URL", "localhost:8000"),
 		},
-		store: store.NewStore(db),
+		store:  store.NewStore(db),
+		logger: logger,
 	}
 
 	mux := app.mount()
-	log.Fatal(app.run(mux))
+	logger.Fatal(app.run(mux))
 }

@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"go.uber.org/zap"
 
 	"github.com/orangeMangoDimz/go-social/docs" // This is required to generate swagger docs
 	"github.com/orangeMangoDimz/go-social/store"
@@ -17,6 +17,7 @@ import (
 type application struct {
 	config config
 	store  store.Storage
+	logger *zap.SugaredLogger
 }
 
 type config struct {
@@ -96,6 +97,6 @@ func (app *application) run(handler http.Handler) error {
 		ReadTimeout:  time.Second * 10,
 		IdleTimeout:  time.Minute,
 	}
-	log.Printf("Server is running on port %s", app.config.addr)
+	app.logger.Infow("server has started", "addr", app.config.addr, "env", app.config.addr)
 	return server.ListenAndServe()
 }
