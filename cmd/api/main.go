@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/orangeMangoDimz/go-social/internal/db"
 	"github.com/orangeMangoDimz/go-social/internal/env"
 	"github.com/orangeMangoDimz/go-social/store"
@@ -53,6 +55,9 @@ func main() {
 			db:     cfg,
 			env:    env.GetString("ENV", "development"),
 			apiURL: env.GetString("EXTERNAL_URL", "localhost:8000"),
+			mail: mailConfig{
+				exp: time.Hour * 24 * 3, // 3 days
+			},
 		},
 		store:  store.NewStore(db),
 		logger: logger,
