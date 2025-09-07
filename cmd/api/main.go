@@ -5,6 +5,7 @@ import (
 
 	"github.com/orangeMangoDimz/go-social/internal/db"
 	"github.com/orangeMangoDimz/go-social/internal/env"
+	"github.com/orangeMangoDimz/go-social/internal/mailer"
 	"github.com/orangeMangoDimz/go-social/store"
 	"go.uber.org/zap"
 )
@@ -48,19 +49,34 @@ func main() {
 
 	defer db.Close()
 	logger.Info("DB Database connection pool established")
+	mail_config := mailConfig{
+		exp:       time.Hour * 24 * 3, // 3 days
+		fromEmail: env.GetString("FROM_EMAIL", ""),
+		sendGrid: SendGridConfig{
+			apiKey: env.GetString("SENDGRID_API_KEY", ""),
+		},
+		mailTrap: mailTrapConfig{
+			apiKey: env.GetString("MAILTRAP_API_KEY", ""),
+		},
+	}
+
+	// mailer := mailer.NewSendGrid(mail_config.sendGrid.apiKey, mail_config.fromEmail)
+	mailtrap, err := mailer.NewMailTrapClient(mail_config.mailTrap.apiKey, mail_config.fromEmail)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	app := application{
 		config: config{
-			addr:   env.GetString("ADDR", ":8000"),
-			db:     cfg,
-			env:    env.GetString("ENV", "development"),
-			apiURL: env.GetString("EXTERNAL_URL", "localhost:8000"),
-			mail: mailConfig{
-				exp: time.Hour * 24 * 3, // 3 days
-			},
+			addr:        env.GetString("ADDR", ":8000"),
+			db:          cfg,
+			env:         env.GetString("ENV", "development"),
+			apiURL:      env.GetString("EXTERNAL_URL", "localhost:8000"),
+			frontendURL: env.GetString("FRONTEND_URL", "http://localhost:3000"),
 		},
 		store:  store.NewStore(db),
 		logger: logger,
+		mail:   mailtrap,
 	}
 
 	mux := app.mount()

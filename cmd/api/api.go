@@ -10,6 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/orangeMangoDimz/go-social/docs" // This is required to generate swagger docs
+	"github.com/orangeMangoDimz/go-social/internal/mailer"
 	"github.com/orangeMangoDimz/go-social/store"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
@@ -18,18 +19,31 @@ type application struct {
 	config config
 	store  store.Storage
 	logger *zap.SugaredLogger
+	mail   mailer.Client
 }
 
 type config struct {
-	addr   string
-	db     dbConfig
-	env    string
-	apiURL string
-	mail   mailConfig
+	addr        string
+	db          dbConfig
+	env         string
+	apiURL      string
+	mail        mailConfig
+	frontendURL string
 }
 
 type mailConfig struct {
-	exp time.Duration
+	sendGrid  SendGridConfig
+	mailTrap  mailTrapConfig
+	fromEmail string
+	exp       time.Duration
+}
+
+type SendGridConfig struct {
+	apiKey string
+}
+
+type mailTrapConfig struct {
+	apiKey string
 }
 
 type dbConfig struct {

@@ -113,7 +113,7 @@ type UpdatePostPayload struct {
 //
 //	@Summary		Get user's post feed
 //	@Description	Get a paginated feed of posts from followed users and own posts
-//	@Tags			posts
+//	@Tags			feed
 //	@Accept			json
 //	@Produce		json
 //	@Param			limit	query		int					false	"Number of posts per page (1-20)"	default(20)		example(10)
