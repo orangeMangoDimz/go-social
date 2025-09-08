@@ -73,6 +73,12 @@ func main() {
 			env:         env.GetString("ENV", "development"),
 			apiURL:      env.GetString("EXTERNAL_URL", "localhost:8000"),
 			frontendURL: env.GetString("FRONTEND_URL", "http://localhost:3000"),
+			auth: authConfig{
+				basic: basicConfig{
+					user: env.GetString("AUTH_BASIC_USER", "admin"),
+					pass: env.GetString("AUTH_BASIC_PASS", "admin"),
+				},
+			},
 		},
 		store:  store.NewStore(db),
 		logger: logger,
