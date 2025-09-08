@@ -26,14 +26,16 @@ type CreatePOstPayload struct {
 // createPostHandler creates a new post
 //
 //	@Summary		Create a new post
-//	@Description	Create a new post with title, content and optional tags
+//	@Description	Create a new post with title, content and optional tags. Requires JWT authentication.
 //	@Tags			posts
 //	@Accept			json
 //	@Produce		json
 //	@Param			payload	body		CreatePOstPayload	true	"Post creation data"
 //	@Success		200		{object}	store.Post			"Created post"
 //	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		401		{object}	map[string]string	"Unauthorized - invalid or missing token"
 //	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Security		BearerAuth
 //	@Router			/posts [post]
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	var payload CreatePOstPayload
@@ -48,12 +50,13 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	user := getUserFromContext(r)
+
 	post := store.Post{
 		Title:   payload.Title,
 		Content: payload.Content,
 		Tags:    payload.Tags,
-		// TODO: change after auth
-		UserId: 1,
+		UserId:  user.ID,
 	}
 
 	ctx := r.Context()
@@ -81,6 +84,8 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 //	@Failure		404		{object}	map[string]string	"Post not found"
 //	@Failure		500		{object}	map[string]string	"Internal server error"
 //	@Router			/posts/{postID} [get]
+//
+//	@Security		BearerAuth
 func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)
 	if post == nil {
@@ -112,7 +117,7 @@ type UpdatePostPayload struct {
 // getUserPostFeed retrieves the user's personalized post feed
 //
 //	@Summary		Get user's post feed
-//	@Description	Get a paginated feed of posts from followed users and own posts
+//	@Description	Get a paginated feed of posts from followed users and own posts. Requires JWT authentication.
 //	@Tags			feed
 //	@Accept			json
 //	@Produce		json
@@ -125,7 +130,9 @@ type UpdatePostPayload struct {
 //	@Param			until	query		string				false	"Posts created before this date"	example("2024-12-31 23:59:59")
 //	@Success		200		{array}		store.Feed			"User's post feed"
 //	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		401		{object}	map[string]string	"Unauthorized - invalid or missing token"
 //	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Security		BearerAuth
 //	@Router			/users/feed [get]
 func (app *application) getUserPostFeed(w http.ResponseWriter, r *http.Request) {
 	fq := store.PaginatedQuery{
@@ -146,8 +153,9 @@ func (app *application) getUserPostFeed(w http.ResponseWriter, r *http.Request) 
 	}
 
 	ctx := r.Context()
+	user := getUserFromContext(r)
 
-	userID := 1
+	userID := user.ID
 
 	feed, err := app.store.Posts.GetUserFeed(ctx, int64(userID), fq)
 	if err != nil {
@@ -165,7 +173,7 @@ func (app *application) getUserPostFeed(w http.ResponseWriter, r *http.Request) 
 // updatePostHandler updates an existing post
 //
 //	@Summary		Update a post
-//	@Description	Update the title and/or content of an existing post
+//	@Description	Update the title and/or content of an existing post. Requires JWT authentication.
 //	@Tags			posts
 //	@Accept			json
 //	@Produce		json
@@ -173,8 +181,10 @@ func (app *application) getUserPostFeed(w http.ResponseWriter, r *http.Request) 
 //	@Param			payload	body		UpdatePostPayload	true	"Post update data"
 //	@Success		200		{object}	store.Post			"Updated post"
 //	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		401		{object}	map[string]string	"Unauthorized - invalid or missing token"
 //	@Failure		404		{object}	map[string]string	"Post not found"
 //	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Security		BearerAuth
 //	@Router			/posts/{postID} [patch]
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)
@@ -220,14 +230,16 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 // deletePostHandler deletes a post by ID
 //
 //	@Summary		Delete a post
-//	@Description	Delete a specific post by its ID
+//	@Description	Delete a specific post by its ID. Requires JWT authentication.
 //	@Tags			posts
 //	@Accept			json
 //	@Produce		json
 //	@Param			postID	path	int	true	"Post ID"	example(1)
 //	@Success		204		"Post successfully deleted"
+//	@Failure		401		{object}	map[string]string	"Unauthorized - invalid or missing token"
 //	@Failure		404		{object}	map[string]string	"Post not found"
 //	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Security		BearerAuth
 //	@Router			/posts/{postID} [delete]
 func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromContext(r)

@@ -8,7 +8,7 @@ import (
 //
 //	@Summary		Health check endpoint
 //	@Description	Returns the current health status, environment, and version of the API
-//	@Tags			oops
+//	@Tags			health
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{object}	map[string]string	"Health status information"

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,14 +17,16 @@ const userCtx userKey = "user"
 // getUserHandler retrieves a user by ID
 //
 //	@Summary		Get user by ID
-//	@Description	Get detailed information about a specific user
+//	@Description	Get detailed information about a specific user. Requires JWT authentication.
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
 //	@Param			userID	path		int					true	"User ID"	example(1)
 //	@Success		200		{object}	store.User			"User information"
+//	@Failure		401		{object}	map[string]string	"Unauthorized - invalid or missing token"
 //	@Failure		404		{object}	map[string]string	"User not found"
 //	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Security		BearerAuth
 //	@Router			/users/{userID} [get]
 func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := getUserFromContext(r)
@@ -40,30 +41,23 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// FollowUser represents the request payload for following/unfollowing a user
-//
-//	@Description	Request payload for follow/unfollow operations
-type FollowUser struct {
-	UserID int64 `json:"user_id" example:"123" validate:"required"` // User ID to follow/unfollow
-}
-
 // followUserHandler allows a user to follow another user
 //
 //	@Summary		Follow a user
-//	@Description	Follow another user to see their posts in your feed
+//	@Description	Follow another user to see their posts in your feed. Requires JWT authentication.
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
-//	@Param			userID	path	int			true	"ID of the user doing the following"	example(1)
-//	@Param			payload	body	FollowUser	true	"User to follow"
+//	@Param			userID	path	int	true	"ID of the user to follow"	example(1)
 //	@Success		204		"Successfully followed user"
 //	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		401		{object}	map[string]string	"Unauthorized - invalid or missing token"
 //	@Failure		404		{object}	map[string]string	"User not found"
 //	@Failure		409		{object}	map[string]string	"Already following this user"
 //	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Security		BearerAuth
 //	@Router			/users/{userID}/follow [put]
 func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("test")
 	// user to follow
 	followerUser := getUserFromContext(r)
 	if followerUser == nil {
@@ -71,16 +65,15 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Revert from ctx
-	var payload FollowUser
-	if err := readJSON(w, r, &payload); err != nil {
+	followedID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
 
 	ctx := r.Context()
 
-	if err := app.store.Followers.Follow(ctx, followerUser.ID, payload.UserID); err != nil {
+	if err := app.store.Followers.Follow(ctx, followerUser.ID, followedID); err != nil {
 		switch {
 		case errors.Is(err, store.ErrUniqueViolation):
 			app.conflictResponse(w, r, errors.New("YOU HAVE FOLLOWED THIS USER"))
@@ -99,36 +92,36 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 // unfollowUserHandler allows a user to unfollow another user
 //
 //	@Summary		Unfollow a user
-//	@Description	Unfollow a user to stop seeing their posts in your feed
+//	@Description	Unfollow a user to stop seeing their posts in your feed. Requires JWT authentication.
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
-//	@Param			userID	path	int			true	"ID of the user doing the unfollowing"	example(1)
-//	@Param			payload	body	FollowUser	true	"User to unfollow"
+//	@Param			userID	path	int	true	"ID of the user to unfollow"	example(1)
 //	@Success		204		"Successfully unfollowed user"
 //	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		401		{object}	map[string]string	"Unauthorized - invalid or missing token"
 //	@Failure		404		{object}	map[string]string	"User not found"
 //	@Failure		409		{object}	map[string]string	"Already unfollowed this user"
 //	@Failure		500		{object}	map[string]string	"Internal server error"
+//	@Security		BearerAuth
 //	@Router			/users/{userID}/unfollow [put]
 func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Request) {
 	// user to follow
-	unfollowedUser := getUserFromContext(r)
-	if unfollowedUser == nil {
+	followerUser := getUserFromContext(r)
+	if followerUser == nil {
 		app.notFoundResponse(w, r, store.ErrNotFound)
 		return
 	}
 
-	// Revert from ctx
-	var payload FollowUser
-	if err := readJSON(w, r, &payload); err != nil {
+	unfollowedID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
 
 	ctx := r.Context()
 
-	if err := app.store.Followers.Unfollow(ctx, unfollowedUser.ID, payload.UserID); err != nil {
+	if err := app.store.Followers.Unfollow(ctx, followerUser.ID, unfollowedID); err != nil {
 		switch {
 		case errors.Is(err, store.ErrUniqueViolation):
 			app.conflictResponse(w, r, errors.New("YOU HAVE UNFOLLOWED THIS USER"))

@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	"github.com/orangeMangoDimz/go-social/internal/auth"
 	"github.com/orangeMangoDimz/go-social/internal/db"
 	"github.com/orangeMangoDimz/go-social/internal/env"
 	"github.com/orangeMangoDimz/go-social/internal/mailer"
@@ -24,9 +25,16 @@ const VERSION = "0.0.1"
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
 //	@BasePath					/v1
-//	@securityDefinitions.apikey	ApiKeyAuth
+//	@securityDefinitions.apikey	BearerAuth
 //	@in							header
 //	@name						Authorization
+//	@description				Enter your bearer token in the format **Bearer &lt;token&gt;**
+
+//	@securityDefinitions.apikey	ApiKeyAuth
+//	@in							header
+//	@name						X-API-KEY
+//	@description				API Key for authorization
+
 //	@description
 
 func main() {
@@ -66,23 +74,37 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	app := application{
-		config: config{
-			addr:        env.GetString("ADDR", ":8000"),
-			db:          cfg,
-			env:         env.GetString("ENV", "development"),
-			apiURL:      env.GetString("EXTERNAL_URL", "localhost:8000"),
-			frontendURL: env.GetString("FRONTEND_URL", "http://localhost:3000"),
-			auth: authConfig{
-				basic: basicConfig{
-					user: env.GetString("AUTH_BASIC_USER", "admin"),
-					pass: env.GetString("AUTH_BASIC_PASS", "admin"),
-				},
+	config := config{
+		addr:        env.GetString("ADDR", ":8000"),
+		db:          cfg,
+		env:         env.GetString("ENV", "development"),
+		apiURL:      env.GetString("EXTERNAL_URL", "localhost:8000"),
+		frontendURL: env.GetString("FRONTEND_URL", "http://localhost:3000"),
+		auth: authConfig{
+			basic: basicConfig{
+				user: env.GetString("AUTH_BASIC_USER", "admin"),
+				pass: env.GetString("AUTH_BASIC_PASS", "admin"),
+			},
+			token: tokenConfig{
+				secret: env.GetString("AUTH_TOKEN_SECRET", "example"),
+				exp:    time.Hour * 24 * 3, // 3 days
+				iss:    "gophersocial",
 			},
 		},
-		store:  store.NewStore(db),
-		logger: logger,
-		mail:   mailtrap,
+	}
+
+	jwtAuthenticator := auth.NewJWTAuthenticator(
+		config.auth.token.secret,
+		config.auth.token.iss,
+		config.auth.token.iss,
+	)
+
+	app := application{
+		config:        config,
+		store:         store.NewStore(db),
+		logger:        logger,
+		mail:          mailtrap,
+		authenticator: jwtAuthenticator,
 	}
 
 	mux := app.mount()
