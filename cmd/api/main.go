@@ -8,6 +8,8 @@ import (
 	"github.com/orangeMangoDimz/go-social/internal/env"
 	"github.com/orangeMangoDimz/go-social/internal/mailer"
 	"github.com/orangeMangoDimz/go-social/store"
+	"github.com/orangeMangoDimz/go-social/store/cache"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
@@ -91,6 +93,19 @@ func main() {
 				iss:    "gophersocial",
 			},
 		},
+		redisCfg: redisConfig{
+			addr:     env.GetString("REDIS_ADDR", "localhost:6379"),
+			password: env.GetString("REDIS_PASSWORD", ""),
+			db:       env.GetInt("REDIS_DB", 0),
+			enabled:  env.GetBool("REDIS_ENABLED", false),
+		},
+	}
+
+	// Cache
+	var rdb *redis.Client
+	if config.redisCfg.enabled {
+		rdb = cache.NewRedisClient(config.redisCfg.addr, config.redisCfg.password, config.redisCfg.db)
+		logger.Info("redis connection established")
 	}
 
 	jwtAuthenticator := auth.NewJWTAuthenticator(
@@ -102,6 +117,7 @@ func main() {
 	app := application{
 		config:        config,
 		store:         store.NewStore(db),
+		cacheStorage:  cache.NewRedisStorage(rdb),
 		logger:        logger,
 		mail:          mailtrap,
 		authenticator: jwtAuthenticator,

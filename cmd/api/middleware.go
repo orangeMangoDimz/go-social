@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -17,7 +18,7 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 		// Get Authorization header
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			app.unauthorizedErrorResponse(w, r, fmt.Errorf("Bearer authorization is missing"))
+			app.unauthorizedErrorResponse(w, r, fmt.Errorf("bearer authorization is missing"))
 			return
 		}
 
@@ -43,12 +44,11 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 		}
 
 		ctx := r.Context()
-		user, err := app.store.Users.GetById(ctx, userID)
+		user, err := app.getUser(ctx, userID)
 		if err != nil {
-			app.unauthorizedErrorResponse(w, r, err)
+			app.internalServerError(w, r, err)
 			return
 		}
-
 		ctx = context.WithValue(ctx, userCtx, user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 
@@ -130,4 +130,33 @@ func (app *application) checkRolePrecedence(ctx context.Context, user *store.Use
 	}
 
 	return user.Role.Level >= role.Level, nil
+}
+
+func (app *application) getUser(ctx context.Context, userID int64) (*store.User, error) {
+	app.logger.Infow("checking cache for user", "id", userID)
+	user, err := app.cacheStorage.Users.Get(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		app.logger.Infow("cache miss, fetching from DB", "id", userID)
+		user, err = app.store.Users.GetById(ctx, userID)
+		if err != nil {
+			switch {
+			case errors.Is(err, store.ErrNotFound):
+				return nil, store.ErrNotFound
+			default:
+				return nil, err
+			}
+		}
+
+		if err := app.cacheStorage.Users.Set(ctx, user); err != nil {
+			return nil, err
+		}
+	} else {
+		app.logger.Infow("cache hit for user", "id", userID)
+	}
+
+	return user, nil
 }
