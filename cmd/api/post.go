@@ -258,7 +258,7 @@ func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if err := app.jsonResponse(w, http.StatusNoContent, nil); err != nil {
+	if err := app.jsonResponse(w, http.StatusAccepted, nil); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
