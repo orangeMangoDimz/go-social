@@ -142,24 +142,6 @@ var tags = []string{
 	"clean-code",
 }
 
-var comments = []string{
-	"This is by far the clearest explanation of Go's concurrency model I've ever read. The worker pool example was fantastic. Thanks for sharing!",
-	"Great article on gRPC! I was wondering, how do you handle API versioning with this approach? Is it just a matter of creating a new .proto file or is there a more idiomatic way?",
-	"Nice overview of the GIL. For CPU-bound tasks, I've had a lot of success using the `multiprocessing` module, but it's good to understand the 'why' behind it.",
-	"Excellent post on Kubernetes deployments. I think there might be a small typo in the Service YAML manifest; the `targetPort` might be pointing to the wrong value. Just a heads-up!",
-	"The section on caching strategies really hit home. We implemented a cache-aside pattern with Redis just last quarter and saw a 60% reduction in database load. This confirms our approach.",
-	"Fantastic deep-dive into FastAPI's dependency injection. How does this compare to the DI system in a framework like NestJS in the Node.js world?",
-	"Thank you for this detailed guide. It was exactly what I needed to get started.",
-	"The breakdown of REST vs. GraphQL was very balanced. I especially appreciated the point about GraphQL's complexity not always being necessary for simple CRUD services.",
-	"Interesting take on error handling in Go. I tend to prefer using a library like `pkg/errors` to wrap errors and add stack traces. I find it makes debugging much easier.",
-	"In the TDD example, why did you choose to mock the database interface instead of using an in-memory test database like SQLite? Curious about the trade-offs.",
-	"This guide on security best practices is super useful. Many of these principles apply directly to our Python/Django backend as well. Great reminders!",
-	"Amazing article on microservice architecture! I'd love to see a follow-up post on distributed tracing and how you'd implement it to monitor requests across these new services.",
-	"The analogy you used to explain Go interfaces finally made them click for me. I've been struggling with that concept for weeks. Thank you!",
-	"Great write-up on PostgreSQL optimization. For anyone looking to go deeper, I'd also recommend the book 'High Performance SQL' by Baron Schwartz.",
-	"I was just tasked with containerizing our main Go service and this Docker tutorial saved me hours of searching. Perfect timing and super easy to follow!",
-}
-
 func Seed(store store.Storage, db *sql.DB) {
 	ctx := context.Background()
 
