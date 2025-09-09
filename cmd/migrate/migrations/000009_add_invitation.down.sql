@@ -1,1 +1,1 @@
-DROP TABLE IF NOT EXISTS user_invitations;
+DROP TABLE IF EXISTS user_invitations;
