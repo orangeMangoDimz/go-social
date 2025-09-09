@@ -1,0 +1,843 @@
+basePath: /v1
+definitions:
+  cmd_api.CreatePOstPayload:
+    description: Request payload for creating a new post
+    properties:
+      content:
+        description: Post content (max 1000 characters)
+        example: This is the content of my post
+        maxLength: 1000
+        type: string
+      tags:
+        description: Post tags
+        example:
+        - golang
+        - programming
+        items:
+          type: string
+        type: array
+      title:
+        description: Post title (max 100 characters)
+        example: My First Post
+        maxLength: 100
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  cmd_api.CreateUserTokenPayload:
+    description: Request payload for creating a JWT authentication token
+    properties:
+      email:
+        description: Email address
+        example: johndoe@example.com
+        maxLength: 255
+        type: string
+      password:
+        description: Password
+        example: securepassword123
+        maxLength: 72
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  cmd_api.RegisterUserPayload:
+    description: Request payload for user registration
+    properties:
+      email:
+        description: Email address (max 255 characters)
+        example: johndoe@example.com
+        maxLength: 255
+        type: string
+      password:
+        description: Password (3-72 characters)
+        example: securepassword123
+        maxLength: 72
+        minLength: 3
+        type: string
+      username:
+        description: Username (max 100 characters)
+        example: johndoe
+        maxLength: 100
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  cmd_api.TokenResponse:
+    description: Response containing a JWT authentication token
+    properties:
+      token:
+        description: JWT authentication token
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  cmd_api.UpdatePostPayload:
+    description: Request payload for updating an existing post
+    properties:
+      content:
+        description: Updated post content (max 1000 characters)
+        example: Updated post content
+        maxLength: 1000
+        type: string
+      title:
+        description: Updated post title (max 100 characters)
+        example: Updated Post Title
+        maxLength: 100
+        type: string
+    type: object
+  cmd_api.UserWithToken:
+    description: User information with activation token
+    properties:
+      created_at:
+        description: Account creation timestamp
+        example: "2024-01-01 12:00:00"
+        type: string
+      email:
+        description: Email address
+        example: johndoe@example.com
+        type: string
+      id:
+        description: User ID
+        example: 1
+        type: integer
+      is_active:
+        type: boolean
+      role:
+        $ref: '#/definitions/store.Role'
+      role_id:
+        type: integer
+      token:
+        description: Activation token
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      username:
+        description: Username
+        example: johndoe
+        type: string
+    type: object
+  store.Comment:
+    description: Comment on a social media post
+    properties:
+      content:
+        description: Comment content
+        example: Great post!
+        type: string
+      created_at:
+        description: Comment creation timestamp
+        example: "2024-01-01 12:00:00"
+        type: string
+      id:
+        description: Comment ID
+        example: 1
+        type: integer
+      post_id:
+        description: ID of the post this comment belongs to
+        example: 123
+        type: integer
+      user:
+        allOf:
+        - $ref: '#/definitions/store.User'
+        description: User who made the comment
+      user_id:
+        description: ID of the user who made the comment
+        example: 456
+        type: integer
+    type: object
+  store.Feed:
+    description: Post feed item with comment count
+    properties:
+      comments:
+        description: Comments on this post
+        items:
+          $ref: '#/definitions/store.Comment'
+        type: array
+      content:
+        description: Post content
+        example: This is my post content
+        type: string
+      created_at:
+        description: Post creation timestamp
+        example: "2024-01-01 12:00:00"
+        type: string
+      id:
+        description: Post ID
+        example: 1
+        type: integer
+      tags:
+        description: Post tags
+        example:
+        - golang
+        - programming
+        items:
+          type: string
+        type: array
+      title:
+        description: Post title
+        example: My First Post
+        type: string
+      total_comment:
+        description: Total number of comments on this post
+        example: 5
+        type: integer
+      updated_at:
+        description: Post last update timestamp
+        example: "2024-01-01 12:30:00"
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/store.User'
+        description: User who created the post
+      user_id:
+        description: ID of the user who created the post
+        example: 123
+        type: integer
+      version:
+        description: Post version for optimistic locking
+        example: 1
+        type: integer
+    type: object
+  store.Post:
+    description: Social media post with content, tags and metadata
+    properties:
+      comments:
+        description: Comments on this post
+        items:
+          $ref: '#/definitions/store.Comment'
+        type: array
+      content:
+        description: Post content
+        example: This is my post content
+        type: string
+      created_at:
+        description: Post creation timestamp
+        example: "2024-01-01 12:00:00"
+        type: string
+      id:
+        description: Post ID
+        example: 1
+        type: integer
+      tags:
+        description: Post tags
+        example:
+        - golang
+        - programming
+        items:
+          type: string
+        type: array
+      title:
+        description: Post title
+        example: My First Post
+        type: string
+      updated_at:
+        description: Post last update timestamp
+        example: "2024-01-01 12:30:00"
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/store.User'
+        description: User who created the post
+      user_id:
+        description: ID of the user who created the post
+        example: 123
+        type: integer
+      version:
+        description: Post version for optimistic locking
+        example: 1
+        type: integer
+    type: object
+  store.Role:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      level:
+        type: integer
+      name:
+        type: string
+    type: object
+  store.User:
+    description: User account information
+    properties:
+      created_at:
+        description: Account creation timestamp
+        example: "2024-01-01 12:00:00"
+        type: string
+      email:
+        description: Email address
+        example: johndoe@example.com
+        type: string
+      id:
+        description: User ID
+        example: 1
+        type: integer
+      is_active:
+        type: boolean
+      role:
+        $ref: '#/definitions/store.Role'
+      role_id:
+        type: integer
+      username:
+        description: Username
+        example: johndoe
+        type: string
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Gopher Social API
+paths:
+  /authentication/token:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password, returns a JWT token
+        for API access
+      parameters:
+      - description: User login credentials
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/cmd_api.CreateUserTokenPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: JWT token created successfully
+          schema:
+            $ref: '#/definitions/cmd_api.TokenResponse'
+        "400":
+          description: Bad request - validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized - invalid credentials
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login and get authentication token
+      tags:
+      - authentication
+  /authentication/user:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with username, email and password. Returns
+        user information with an activation token.
+      parameters:
+      - description: User registration data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/cmd_api.RegisterUserPayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: User created successfully, activation required
+          schema:
+            $ref: '#/definitions/cmd_api.UserWithToken'
+        "400":
+          description: Bad request - validation error or duplicate email/username
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - authentication
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Returns the current health status, environment, and version of
+        the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Health status information
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check endpoint
+      tags:
+      - health
+  /posts:
+    post:
+      consumes:
+      - application/json
+      description: Create a new post with title, content and optional tags. Requires
+        JWT authentication.
+      parameters:
+      - description: Post creation data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/cmd_api.CreatePOstPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Created post
+          schema:
+            $ref: '#/definitions/store.Post'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized - invalid or missing token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new post
+      tags:
+      - posts
+  /posts/{postID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a specific post by its ID. Requires JWT authentication.
+      parameters:
+      - description: Post ID
+        example: 1
+        in: path
+        name: postID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Post successfully deleted
+        "401":
+          description: Unauthorized - invalid or missing token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Post not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a post
+      tags:
+      - posts
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a specific post including comments
+      parameters:
+      - description: Post ID
+        example: 1
+        in: path
+        name: postID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Post information with comments
+          schema:
+            $ref: '#/definitions/store.Post'
+        "404":
+          description: Post not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get post by ID
+      tags:
+      - posts
+    patch:
+      consumes:
+      - application/json
+      description: Update the title and/or content of an existing post. Requires JWT
+        authentication.
+      parameters:
+      - description: Post ID
+        example: 1
+        in: path
+        name: postID
+        required: true
+        type: integer
+      - description: Post update data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/cmd_api.UpdatePostPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated post
+          schema:
+            $ref: '#/definitions/store.Post'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized - invalid or missing token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Post not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a post
+      tags:
+      - posts
+  /users/{userID}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a specific user. Requires JWT authentication.
+      parameters:
+      - description: User ID
+        example: 1
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User information
+          schema:
+            $ref: '#/definitions/store.User'
+        "401":
+          description: Unauthorized - invalid or missing token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - users
+  /users/{userID}/follow:
+    put:
+      consumes:
+      - application/json
+      description: Follow another user to see their posts in your feed. Requires JWT
+        authentication.
+      parameters:
+      - description: ID of the user to follow
+        example: 1
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Successfully followed user
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized - invalid or missing token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Already following this user
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Follow a user
+      tags:
+      - users
+  /users/{userID}/unfollow:
+    put:
+      consumes:
+      - application/json
+      description: Unfollow a user to stop seeing their posts in your feed. Requires
+        JWT authentication.
+      parameters:
+      - description: ID of the user to unfollow
+        example: 1
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Successfully unfollowed user
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized - invalid or missing token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Already unfollowed this user
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Unfollow a user
+      tags:
+      - users
+  /users/activate/{token}:
+    put:
+      consumes:
+      - application/json
+      description: Activate a user account using the activation token received during
+        registration
+      parameters:
+      - description: Activation token
+        example: '"550e8400-e29b-41d4-a716-446655440000"'
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User account activated successfully
+        "404":
+          description: Token not found or invalid
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Activate user account
+      tags:
+      - authentication
+  /users/feed:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated feed of posts from followed users and own posts.
+        Requires JWT authentication.
+      parameters:
+      - default: 20
+        description: Number of posts per page (1-20)
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Number of posts to skip
+        example: 0
+        in: query
+        name: offset
+        type: integer
+      - default: desc
+        description: Sort order (asc/desc)
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
+      - description: Search in title and content
+        example: '"golang"'
+        in: query
+        name: search
+        type: string
+      - description: Comma-separated list of tags
+        example: '"golang,programming"'
+        in: query
+        name: tags
+        type: string
+      - description: Posts created after this date
+        example: '"2024-01-01 00:00:00"'
+        in: query
+        name: since
+        type: string
+      - description: Posts created before this date
+        example: '"2024-12-31 23:59:59"'
+        in: query
+        name: until
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User's post feed
+          schema:
+            items:
+              $ref: '#/definitions/store.Feed'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized - invalid or missing token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user's post feed
+      tags:
+      - feed
+securityDefinitions:
+  ApiKeyAuth:
+    description: API Key for authorization
+    in: header
+    name: X-API-KEY
+    type: apiKey
+  BearerAuth:
+    description: Enter your bearer token in the format **Bearer &lt;token&gt;**
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
