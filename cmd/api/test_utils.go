@@ -6,28 +6,37 @@ import (
 	"testing"
 
 	"github.com/orangeMangoDimz/go-social/internal/auth"
+	"github.com/orangeMangoDimz/go-social/internal/ratelimiter"
 	"github.com/orangeMangoDimz/go-social/store"
 	"github.com/orangeMangoDimz/go-social/store/cache"
 	"go.uber.org/zap"
 )
 
-func newTestApplication(t *testing.T) *application {
+func newTestApplication(t *testing.T, cfg config) *application {
 	t.Helper()
 
-	logger := zap.NewNop().Sugar() // Ignore logs
-	// logger := zap.Must(zap.NewProduction()).Sugar() // Show logs
-
+	logger := zap.NewNop().Sugar()
+	// Uncomment to enable logs
+	// logger := zap.Must(zap.NewProduction()).Sugar()
 	mockStore := store.NewMockStore()
 	mockCacheStore := cache.NewMockStore()
+
 	testAuth := &auth.TestAuthenticator{}
+
+	// Rate limiter
+	rateLimiter := ratelimiter.NewFixedWindowLimiter(
+		cfg.rateLimiter.RequestPerTimeFrame,
+		cfg.rateLimiter.TimeFrame,
+	)
 
 	return &application{
 		logger:        logger,
 		store:         mockStore,
 		cacheStorage:  mockCacheStore,
 		authenticator: testAuth,
+		config:        cfg,
+		rateLimiter:   rateLimiter,
 	}
-
 }
 
 func executeRequest(req *http.Request, mux http.Handler) *httptest.ResponseRecorder {

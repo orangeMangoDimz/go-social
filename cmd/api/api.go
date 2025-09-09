@@ -17,6 +17,7 @@ import (
 	"github.com/orangeMangoDimz/go-social/docs" // This is required to generate swagger docs
 	"github.com/orangeMangoDimz/go-social/internal/auth"
 	"github.com/orangeMangoDimz/go-social/internal/mailer"
+	"github.com/orangeMangoDimz/go-social/internal/ratelimiter"
 	"github.com/orangeMangoDimz/go-social/store"
 	"github.com/orangeMangoDimz/go-social/store/cache"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -29,6 +30,7 @@ type application struct {
 	logger        *zap.SugaredLogger
 	mail          mailer.Client
 	authenticator auth.Authenticator
+	rateLimiter   ratelimiter.Limiter
 }
 
 type config struct {
@@ -40,6 +42,7 @@ type config struct {
 	frontendURL string
 	auth        authConfig
 	redisCfg    redisConfig
+	rateLimiter ratelimiter.Config
 }
 
 type redisConfig struct {
@@ -95,6 +98,10 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+
+	if app.config.rateLimiter.Enabled {
+		r.Use(app.RateLimiterMiddleware)
+	}
 
 	// Set a timeout value on the request context (ctx), that will signal
 	// through ctx.Done() that the request has timed out and further

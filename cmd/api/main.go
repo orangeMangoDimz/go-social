@@ -7,6 +7,7 @@ import (
 	"github.com/orangeMangoDimz/go-social/internal/db"
 	"github.com/orangeMangoDimz/go-social/internal/env"
 	"github.com/orangeMangoDimz/go-social/internal/mailer"
+	"github.com/orangeMangoDimz/go-social/internal/ratelimiter"
 	"github.com/orangeMangoDimz/go-social/store"
 	"github.com/orangeMangoDimz/go-social/store/cache"
 	"github.com/redis/go-redis/v9"
@@ -76,6 +77,12 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	rateLimiterCfg := ratelimiter.Config{
+		RequestPerTimeFrame: env.GetInt("RATELIMITER_REQUESTS_COUNT", 20),
+		TimeFrame:           time.Second * 5,
+		Enabled:             env.GetBool("RATELIMITER_ENABLED", true),
+	}
+
 	config := config{
 		addr:        env.GetString("ADDR", ":8000"),
 		db:          cfg,
@@ -99,6 +106,7 @@ func main() {
 			db:       env.GetInt("REDIS_DB", 0),
 			enabled:  env.GetBool("REDIS_ENABLED", false),
 		},
+		rateLimiter: rateLimiterCfg,
 	}
 
 	// Cache
@@ -114,6 +122,11 @@ func main() {
 		config.auth.token.iss,
 	)
 
+	rateLimiter := ratelimiter.NewFixedWindowLimiter(
+		rateLimiterCfg.RequestPerTimeFrame,
+		rateLimiterCfg.TimeFrame,
+	)
+
 	app := application{
 		config:        config,
 		store:         store.NewStore(db),
@@ -121,6 +134,7 @@ func main() {
 		logger:        logger,
 		mail:          mailtrap,
 		authenticator: jwtAuthenticator,
+		rateLimiter:   rateLimiter,
 	}
 
 	mux := app.mount()
