@@ -1,5 +1,61 @@
 # Changelog
 
+## [1.1.0](https://github.com/orangeMangoDimz/go-social/compare/v1.0.0...v1.1.0) (2025-09-09)
+
+
+### Features
+
+* add activate handler logic ([ed04e41](https://github.com/orangeMangoDimz/go-social/commit/ed04e416af0acd431effa46092b236fc69f6314b))
+* add authentication handler logic ([c2b2a5f](https://github.com/orangeMangoDimz/go-social/commit/c2b2a5f06ce9731405d14c554bd6166122bf4378))
+* add authentication register user handler logic ([bf35819](https://github.com/orangeMangoDimz/go-social/commit/bf35819ccb1846a433ad640362400ef6dd796c93))
+* add authorization handler logic ([96e4457](https://github.com/orangeMangoDimz/go-social/commit/96e445711dc0bb0e8bc7e4c7cf3f20f3033ab6a4))
+* add basic auth handler for health cheker ([a6483e1](https://github.com/orangeMangoDimz/go-social/commit/a6483e1c84e61adfc8e8cc30e236d2661ebe197e))
+* add comment list to get post handler ([43956ec](https://github.com/orangeMangoDimz/go-social/commit/43956ec9a0e6160a4d5aa097afecc444e333a787))
+* add comments based on post id logic ([91859f2](https://github.com/orangeMangoDimz/go-social/commit/91859f24daf1840581e574218eaaeeb304a68166))
+* add connection timeout ([519f5a0](https://github.com/orangeMangoDimz/go-social/commit/519f5a0a7c35b44b8089190e5d0725981909bc30))
+* add CORS config ([d45ec2b](https://github.com/orangeMangoDimz/go-social/commit/d45ec2b5b666b550cee2d74cf0163d8cb79582a3))
+* add create post data logic handler ([115a006](https://github.com/orangeMangoDimz/go-social/commit/115a006203e50ba1f3ed8673207626b61b3d99e2))
+* add delete post logic ([32c37f9](https://github.com/orangeMangoDimz/go-social/commit/32c37f9b58d71d6876684a2755a189b98fc8e991))
+* add docker compose for postgresql ([e2537fd](https://github.com/orangeMangoDimz/go-social/commit/e2537fd3b1cee044a2bf320a504bd8566472a00a))
+* add dockerfile ([aea07b5](https://github.com/orangeMangoDimz/go-social/commit/aea07b50b7ebc98a449e0f00309eab8879ac0082))
+* add email template ([f8e6089](https://github.com/orangeMangoDimz/go-social/commit/f8e6089dabfef49aee6375ca567cdf1563942018))
+* add error conflict response utils ([2273add](https://github.com/orangeMangoDimz/go-social/commit/2273addbf7e1eb0c3d2f6150330fc36a9a419949))
+* add error utils handler ([e94ee44](https://github.com/orangeMangoDimz/go-social/commit/e94ee44e7f6e19d92fca49cc5851383c59c6e1ad))
+* add follow another user handler logic ([22f9786](https://github.com/orangeMangoDimz/go-social/commit/22f9786d5316bd25fd3cfb375a70294cfdfd997f))
+* add get user handler logic and user-context-middleware ([6c3318e](https://github.com/orangeMangoDimz/go-social/commit/6c3318ed08fd1b3cabfa3b61c9d335035e3c78a3))
+* add github workflow ([e8df2f4](https://github.com/orangeMangoDimz/go-social/commit/e8df2f465f0ba7aa673275c00fc8d1d62d339567))
+* add health handler ([022e67a](https://github.com/orangeMangoDimz/go-social/commit/022e67a4e3dc5682f1a8ec2ecd4872abc733ef20))
+* add json utils function ([7042ac6](https://github.com/orangeMangoDimz/go-social/commit/7042ac612fea5f9e0782e05f577fda140ff49d08))
+* add logger ([3bf6a26](https://github.com/orangeMangoDimz/go-social/commit/3bf6a26738ca8c0af21bce1dea6956b03e05866c))
+* add post context middleware ([2957951](https://github.com/orangeMangoDimz/go-social/commit/29579510f73449cc5da1ebc6a95c0f8d7699cb77))
+* add post get by id logic ([53ea27b](https://github.com/orangeMangoDimz/go-social/commit/53ea27b69af27170e0fb2734d23a0e3a354fbd1c))
+* add post update logic ([1e52080](https://github.com/orangeMangoDimz/go-social/commit/1e52080e5db6ecc8dd07225efd3198766848e9b4))
+* add postgresql db config ([e17183f](https://github.com/orangeMangoDimz/go-social/commit/e17183f6bfab5ce400dac97f17eee8df8ac4a49c))
+* add rate limiter middleware logic ([094a930](https://github.com/orangeMangoDimz/go-social/commit/094a9303cb20b69383de4c8888726d570e5f46a1))
+* add redis cache handle logic ([ef335b7](https://github.com/orangeMangoDimz/go-social/commit/ef335b776cb3cf96a50552dd896229d6005bf6cc))
+* add seed DB logic ([27f2a23](https://github.com/orangeMangoDimz/go-social/commit/27f2a233e89ab56f517a4f89f1b75cb991c1e281))
+* add simple user unit test ([bee1692](https://github.com/orangeMangoDimz/go-social/commit/bee16920ed3385f50c94f11f00565628487797b1))
+* add unfollow user handler logic ([506d2e5](https://github.com/orangeMangoDimz/go-social/commit/506d2e57b245b39be8d81807da5a7c8380305993))
+* add user post feed handler logic ([9d4dcd8](https://github.com/orangeMangoDimz/go-social/commit/9d4dcd8de4f8be8ab64fca3ae9e9daf01b80fb2a))
+* add validaiton on creating post handler ([afc7726](https://github.com/orangeMangoDimz/go-social/commit/afc772698a37fe51d95a66c4af190a84e191a627))
+* add versioning mechanism to prevent race condition ([68340ee](https://github.com/orangeMangoDimz/go-social/commit/68340ee928c22b09ce74ad286513244328d94e96))
+* addl release please script ([ed4113e](https://github.com/orangeMangoDimz/go-social/commit/ed4113ea340b4abe510a0713628538e6903a78dc))
+* filter, sort, and pagination handler logic ([861af54](https://github.com/orangeMangoDimz/go-social/commit/861af5400f37462dba798e89d2bc93315cd29b95))
+* implement create post repository ([6bc1e80](https://github.com/orangeMangoDimz/go-social/commit/6bc1e800710c35d9f15d1479ed179147b2026899))
+* implement create user logic repository ([5e275f0](https://github.com/orangeMangoDimz/go-social/commit/5e275f007e5521239bad99069ce53ce65287972d))
+* implement sendgrid and mailtrap handler logic ([38c0265](https://github.com/orangeMangoDimz/go-social/commit/38c0265ab9fb7f6be63c8b5df7126e613c5098d9))
+* update api version automaticly ([63ef49f](https://github.com/orangeMangoDimz/go-social/commit/63ef49f60abb7ac5bea37e48514888f010bc80f2))
+
+
+### Bug Fixes
+
+* handle case when server shuts down directly ([0e61245](https://github.com/orangeMangoDimz/go-social/commit/0e61245fb88cb8fee7a392aca0c82049f1b677a2))
+* handle sandbox mode for sending email token ([efe41f5](https://github.com/orangeMangoDimz/go-social/commit/efe41f5ae0e5be8c04a6d532de3d008ad96e6d9d))
+* remove unused user middleware ([1f0b8cc](https://github.com/orangeMangoDimz/go-social/commit/1f0b8cc5a56aedb8169059659ce74a5150ea55f4))
+* remove unused variable on seed file ([5ea5ba7](https://github.com/orangeMangoDimz/go-social/commit/5ea5ba78929f36134fc5a8488666eba6cf33f33c))
+* role creation issue ([28c335c](https://github.com/orangeMangoDimz/go-social/commit/28c335c85b107f432a216a13ff7ba809ce0aee2c))
+* VERSION naming in dockerfile ([9329fb6](https://github.com/orangeMangoDimz/go-social/commit/9329fb67c2e60f6310846492306986e36d4e7e1a))
+
 ## 1.0.0 (2025-09-09)
 
 
