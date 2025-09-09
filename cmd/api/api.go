@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -155,6 +160,42 @@ func (app *application) run(handler http.Handler) error {
 		ReadTimeout:  time.Second * 10,
 		IdleTimeout:  time.Minute,
 	}
-	app.logger.Infow("server has started", "addr", app.config.addr, "env", app.config.addr)
+
+	// Channel to handle graceful shutdown errors
+	shutdown := make(chan error)
+
+	// Goroutine for graceful shutdown handling
+	// Listens for OS signals (SIGINT/SIGTERM) and initiates server shutdown
+	go func() {
+		quit := make(chan os.Signal, 1)
+
+		// Register the channel to receive specific OS signals
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+		s := <-quit // Block until a signal is received
+
+		// Create context with 5-second timeout for graceful shutdown
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		app.logger.Infow("signal caught", "signal", s.String())
+
+		// Send shutdown result to main goroutine
+		shutdown <- server.Shutdown(ctx)
+	}()
+
+	app.logger.Infow("server has started", "addr", app.config.addr, "env", app.config.env)
+
+	// Start the HTTP server (blocking call)
+	err := server.ListenAndServe()
+	if !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+
+	// Wait for shutdown completion and handle any shutdown errors
+	err = <-shutdown
+	if err != nil {
+		return err
+	}
+
 	return server.ListenAndServe()
 }
