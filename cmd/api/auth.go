@@ -11,7 +11,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/orangeMangoDimz/go-social/internal/mailer"
-	"github.com/orangeMangoDimz/go-social/store"
+	"github.com/orangeMangoDimz/go-social/internal/store"
 )
 
 // RegisterUserPayload represents the request payload for user registration

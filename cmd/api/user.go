@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/orangeMangoDimz/go-social/store"
+	"github.com/orangeMangoDimz/go-social/internal/store"
 )
 
 type userKey string

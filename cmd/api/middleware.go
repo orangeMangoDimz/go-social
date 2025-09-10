@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/orangeMangoDimz/go-social/store"
+	"github.com/orangeMangoDimz/go-social/internal/store"
 )
 
 func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {

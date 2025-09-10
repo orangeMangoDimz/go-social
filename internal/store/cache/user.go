@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/orangeMangoDimz/go-social/store"
+	"github.com/orangeMangoDimz/go-social/internal/store"
 	"github.com/redis/go-redis/v9"
 )
 

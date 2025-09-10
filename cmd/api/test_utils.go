@@ -7,8 +7,8 @@ import (
 
 	"github.com/orangeMangoDimz/go-social/internal/auth"
 	"github.com/orangeMangoDimz/go-social/internal/ratelimiter"
-	"github.com/orangeMangoDimz/go-social/store"
-	"github.com/orangeMangoDimz/go-social/store/cache"
+	"github.com/orangeMangoDimz/go-social/internal/store"
+	"github.com/orangeMangoDimz/go-social/internal/store/cache"
 	"go.uber.org/zap"
 )
 

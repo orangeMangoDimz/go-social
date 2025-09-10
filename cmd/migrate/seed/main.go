@@ -5,7 +5,7 @@ import (
 
 	"github.com/orangeMangoDimz/go-social/internal/db"
 	"github.com/orangeMangoDimz/go-social/internal/env"
-	"github.com/orangeMangoDimz/go-social/store"
+	"github.com/orangeMangoDimz/go-social/internal/store"
 )
 
 func main() {

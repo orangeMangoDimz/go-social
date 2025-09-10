@@ -7,7 +7,7 @@ import (
 	"log"
 	"math/rand"
 
-	"github.com/orangeMangoDimz/go-social/store"
+	"github.com/orangeMangoDimz/go-social/internal/store"
 )
 
 var usernames = []string{
