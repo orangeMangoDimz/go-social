@@ -7,7 +7,10 @@ import (
 	"log"
 	"math/rand"
 
-	"github.com/orangeMangoDimz/go-social/internal/store"
+	commentsEntity "github.com/orangeMangoDimz/go-social/internal/entities/comments"
+	postsEntity "github.com/orangeMangoDimz/go-social/internal/entities/posts"
+	usersEntity "github.com/orangeMangoDimz/go-social/internal/entities/users"
+	"github.com/orangeMangoDimz/go-social/internal/storage"
 )
 
 var usernames = []string{
@@ -142,7 +145,7 @@ var tags = []string{
 	"clean-code",
 }
 
-func Seed(store store.Storage, db *sql.DB) {
+func Seed(store storage.Storage, db *sql.DB) {
 	ctx := context.Background()
 
 	users := generateUsers(100)
@@ -177,14 +180,14 @@ func Seed(store store.Storage, db *sql.DB) {
 	log.Println("Seeding complete!")
 }
 
-func generateUsers(num int) []*store.User {
-	users := make([]*store.User, num)
+func generateUsers(num int) []*usersEntity.User {
+	users := make([]*usersEntity.User, num)
 
 	for i := 0; i < num; i++ {
-		users[i] = &store.User{
+		users[i] = &usersEntity.User{
 			Username: usernames[i%len(usernames)] + fmt.Sprintf("%d", i+1),
 			Email:    usernames[i%len(usernames)] + fmt.Sprintf("%d", i+1) + "@example.com",
-			Role: store.Role{
+			Role: usersEntity.Role{
 				Name: "user",
 			},
 		}
@@ -192,11 +195,11 @@ func generateUsers(num int) []*store.User {
 	return users
 }
 
-func generatePosts(num int, users []*store.User) []*store.Post {
-	posts := make([]*store.Post, num)
+func generatePosts(num int, users []*usersEntity.User) []*postsEntity.Post {
+	posts := make([]*postsEntity.Post, num)
 	for i := 0; i < num; i++ {
 		user := users[rand.Intn(len(users))]
-		posts[i] = &store.Post{
+		posts[i] = &postsEntity.Post{
 			UserId:  user.ID,
 			Title:   titles[rand.Intn(len(titles))],
 			Content: contents[rand.Intn(len(contents))],
@@ -210,10 +213,10 @@ func generatePosts(num int, users []*store.User) []*store.Post {
 	return posts
 }
 
-func generateComments(num int, users []*store.User, posts []*store.Post) []*store.Comment {
-	comments := make([]*store.Comment, num)
+func generateComments(num int, users []*usersEntity.User, posts []*postsEntity.Post) []*commentsEntity.Comment {
+	comments := make([]*commentsEntity.Comment, num)
 	for i := 0; i < num; i++ {
-		comments[i] = &store.Comment{
+		comments[i] = &commentsEntity.Comment{
 			PostID:  posts[rand.Intn(len(posts))].ID,
 			UserID:  users[rand.Intn(len(users))].ID,
 			Content: contents[rand.Intn(len(contents))],

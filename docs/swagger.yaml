@@ -1,6 +1,34 @@
 basePath: /v1
 definitions:
-  cmd_api.CreatePOstPayload:
+  github_com_orangeMangoDimz_go-social_internal_entities_comments.Comment:
+    description: Comment on a social media post
+    properties:
+      content:
+        description: Comment content
+        example: Great post!
+        type: string
+      created_at:
+        description: Comment creation timestamp
+        example: "2024-01-01 12:00:00"
+        type: string
+      id:
+        description: Comment ID
+        example: 1
+        type: integer
+      post_id:
+        description: ID of the post this comment belongs to
+        example: 123
+        type: integer
+      user:
+        allOf:
+        - $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.User'
+        description: User who made the comment
+      user_id:
+        description: ID of the user who made the comment
+        example: 456
+        type: integer
+    type: object
+  github_com_orangeMangoDimz_go-social_internal_entities_payload.CreatePOstPayload:
     description: Request payload for creating a new post
     properties:
       content:
@@ -25,8 +53,7 @@ definitions:
     - content
     - title
     type: object
-  cmd_api.CreateUserTokenPayload:
-    description: Request payload for creating a JWT authentication token
+  github_com_orangeMangoDimz_go-social_internal_entities_payload.CreateUserTokenPayload:
     properties:
       email:
         description: Email address
@@ -43,7 +70,7 @@ definitions:
     - email
     - password
     type: object
-  cmd_api.RegisterUserPayload:
+  github_com_orangeMangoDimz_go-social_internal_entities_payload.RegisterUserPayload:
     description: Request payload for user registration
     properties:
       email:
@@ -67,7 +94,7 @@ definitions:
     - password
     - username
     type: object
-  cmd_api.TokenResponse:
+  github_com_orangeMangoDimz_go-social_internal_entities_payload.TokenResponse:
     description: Response containing a JWT authentication token
     properties:
       token:
@@ -75,7 +102,7 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
     type: object
-  cmd_api.UpdatePostPayload:
+  github_com_orangeMangoDimz_go-social_internal_entities_payload.UpdatePostPayload:
     description: Request payload for updating an existing post
     properties:
       content:
@@ -89,7 +116,7 @@ definitions:
         maxLength: 100
         type: string
     type: object
-  cmd_api.UserWithToken:
+  github_com_orangeMangoDimz_go-social_internal_entities_payload.UserWithToken:
     description: User information with activation token
     properties:
       created_at:
@@ -107,7 +134,7 @@ definitions:
       is_active:
         type: boolean
       role:
-        $ref: '#/definitions/store.Role'
+        $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.Role'
       role_id:
         type: integer
       token:
@@ -119,41 +146,13 @@ definitions:
         example: johndoe
         type: string
     type: object
-  store.Comment:
-    description: Comment on a social media post
-    properties:
-      content:
-        description: Comment content
-        example: Great post!
-        type: string
-      created_at:
-        description: Comment creation timestamp
-        example: "2024-01-01 12:00:00"
-        type: string
-      id:
-        description: Comment ID
-        example: 1
-        type: integer
-      post_id:
-        description: ID of the post this comment belongs to
-        example: 123
-        type: integer
-      user:
-        allOf:
-        - $ref: '#/definitions/store.User'
-        description: User who made the comment
-      user_id:
-        description: ID of the user who made the comment
-        example: 456
-        type: integer
-    type: object
-  store.Feed:
+  github_com_orangeMangoDimz_go-social_internal_entities_posts.Feed:
     description: Post feed item with comment count
     properties:
       comments:
         description: Comments on this post
         items:
-          $ref: '#/definitions/store.Comment'
+          $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_comments.Comment'
         type: array
       content:
         description: Post content
@@ -189,7 +188,7 @@ definitions:
         type: string
       user:
         allOf:
-        - $ref: '#/definitions/store.User'
+        - $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.User'
         description: User who created the post
       user_id:
         description: ID of the user who created the post
@@ -200,13 +199,13 @@ definitions:
         example: 1
         type: integer
     type: object
-  store.Post:
+  github_com_orangeMangoDimz_go-social_internal_entities_posts.Post:
     description: Social media post with content, tags and metadata
     properties:
       comments:
         description: Comments on this post
         items:
-          $ref: '#/definitions/store.Comment'
+          $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_comments.Comment'
         type: array
       content:
         description: Post content
@@ -238,7 +237,7 @@ definitions:
         type: string
       user:
         allOf:
-        - $ref: '#/definitions/store.User'
+        - $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.User'
         description: User who created the post
       user_id:
         description: ID of the user who created the post
@@ -249,7 +248,7 @@ definitions:
         example: 1
         type: integer
     type: object
-  store.Role:
+  github_com_orangeMangoDimz_go-social_internal_entities_users.Role:
     properties:
       description:
         type: string
@@ -260,7 +259,7 @@ definitions:
       name:
         type: string
     type: object
-  store.User:
+  github_com_orangeMangoDimz_go-social_internal_entities_users.User:
     description: User account information
     properties:
       created_at:
@@ -278,7 +277,7 @@ definitions:
       is_active:
         type: boolean
       role:
-        $ref: '#/definitions/store.Role'
+        $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.Role'
       role_id:
         type: integer
       username:
@@ -286,16 +285,20 @@ definitions:
         example: johndoe
         type: string
     type: object
+host: localhost:8080
 info:
   contact:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
+  description: A social media API service built with Go featuring user management,
+    posts, comments, and following functionality
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
   title: Gopher Social API
+  version: 1.1.0
 paths:
   /authentication/token:
     post:
@@ -309,14 +312,14 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/cmd_api.CreateUserTokenPayload'
+          $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.CreateUserTokenPayload'
       produces:
       - application/json
       responses:
         "201":
           description: JWT token created successfully
           schema:
-            $ref: '#/definitions/cmd_api.TokenResponse'
+            $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.TokenResponse'
         "400":
           description: Bad request - validation error
           schema:
@@ -350,14 +353,14 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/cmd_api.RegisterUserPayload'
+          $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.RegisterUserPayload'
       produces:
       - application/json
       responses:
-        "202":
+        "201":
           description: User created successfully, activation required
           schema:
-            $ref: '#/definitions/cmd_api.UserWithToken'
+            $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.UserWithToken'
         "400":
           description: Bad request - validation error or duplicate email/username
           schema:
@@ -409,14 +412,14 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/cmd_api.CreatePOstPayload'
+          $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.CreatePOstPayload'
       produces:
       - application/json
       responses:
         "200":
           description: Created post
           schema:
-            $ref: '#/definitions/store.Post'
+            $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_posts.Post'
         "400":
           description: Bad request
           schema:
@@ -497,7 +500,7 @@ paths:
         "200":
           description: Post information with comments
           schema:
-            $ref: '#/definitions/store.Post'
+            $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_posts.Post'
         "404":
           description: Post not found
           schema:
@@ -532,14 +535,14 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/cmd_api.UpdatePostPayload'
+          $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.UpdatePostPayload'
       produces:
       - application/json
       responses:
         "200":
           description: Updated post
           schema:
-            $ref: '#/definitions/store.Post'
+            $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_posts.Post'
         "400":
           description: Bad request
           schema:
@@ -569,6 +572,85 @@ paths:
       summary: Update a post
       tags:
       - posts
+  /posts/feed:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated feed of posts from followed users and own posts.
+        Requires JWT authentication.
+      parameters:
+      - default: 20
+        description: Number of posts per page (1-20)
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Number of posts to skip
+        example: 0
+        in: query
+        name: offset
+        type: integer
+      - default: desc
+        description: Sort order (asc/desc)
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
+      - description: Search in title and content
+        example: '"golang"'
+        in: query
+        name: search
+        type: string
+      - description: Comma-separated list of tags
+        example: '"golang,programming"'
+        in: query
+        name: tags
+        type: string
+      - description: Posts created after this date
+        example: '"2024-01-01 00:00:00"'
+        in: query
+        name: since
+        type: string
+      - description: Posts created before this date
+        example: '"2024-12-31 23:59:59"'
+        in: query
+        name: until
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User's post feed
+          schema:
+            items:
+              $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_posts.Feed'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized - invalid or missing token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user's post feed
+      tags:
+      - feed
   /users/{userID}:
     get:
       consumes:
@@ -587,7 +669,7 @@ paths:
         "200":
           description: User information
           schema:
-            $ref: '#/definitions/store.User'
+            $ref: '#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.User'
         "401":
           description: Unauthorized - invalid or missing token
           schema:
@@ -733,7 +815,7 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
+        "202":
           description: User account activated successfully
         "404":
           description: Token not found or invalid
@@ -750,85 +832,6 @@ paths:
       summary: Activate user account
       tags:
       - authentication
-  /users/feed:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated feed of posts from followed users and own posts.
-        Requires JWT authentication.
-      parameters:
-      - default: 20
-        description: Number of posts per page (1-20)
-        example: 10
-        in: query
-        name: limit
-        type: integer
-      - default: 0
-        description: Number of posts to skip
-        example: 0
-        in: query
-        name: offset
-        type: integer
-      - default: desc
-        description: Sort order (asc/desc)
-        enum:
-        - asc
-        - desc
-        in: query
-        name: sort
-        type: string
-      - description: Search in title and content
-        example: '"golang"'
-        in: query
-        name: search
-        type: string
-      - description: Comma-separated list of tags
-        example: '"golang,programming"'
-        in: query
-        name: tags
-        type: string
-      - description: Posts created after this date
-        example: '"2024-01-01 00:00:00"'
-        in: query
-        name: since
-        type: string
-      - description: Posts created before this date
-        example: '"2024-12-31 23:59:59"'
-        in: query
-        name: until
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User's post feed
-          schema:
-            items:
-              $ref: '#/definitions/store.Feed'
-            type: array
-        "400":
-          description: Bad request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized - invalid or missing token
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get user's post feed
-      tags:
-      - feed
 securityDefinitions:
   ApiKeyAuth:
     description: API Key for authorization

@@ -3,13 +3,16 @@ package main
 import (
 	"net/http"
 	"testing"
+
+	"github.com/orangeMangoDimz/go-social/internal/config"
 )
 
 func TestGetUser(t *testing.T) {
 
-	app := newTestApplication(t, config{})
-	mux := app.mount()
-	testToken, err := app.authenticator.GenerateToken(nil)
+	app := newTestApplication(t, config.Config{})
+
+	mux := app.Mount("1.0.0")
+	testToken, err := app.Authenticator.GenerateToken(nil)
 	if err != nil {
 		t.Fatal(err)
 	}

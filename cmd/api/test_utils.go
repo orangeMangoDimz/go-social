@@ -6,36 +6,38 @@ import (
 	"testing"
 
 	"github.com/orangeMangoDimz/go-social/internal/auth"
+	"github.com/orangeMangoDimz/go-social/internal/config"
 	"github.com/orangeMangoDimz/go-social/internal/ratelimiter"
-	"github.com/orangeMangoDimz/go-social/internal/store"
-	"github.com/orangeMangoDimz/go-social/internal/store/cache"
+	httpserver "github.com/orangeMangoDimz/go-social/internal/server/http"
+	"github.com/orangeMangoDimz/go-social/internal/storage/cache"
+	"github.com/orangeMangoDimz/go-social/internal/storage/postgres"
 	"go.uber.org/zap"
 )
 
-func newTestApplication(t *testing.T, cfg config) *application {
+func newTestApplication(t *testing.T, cfg config.Config) *httpserver.Application {
 	t.Helper()
 
 	logger := zap.NewNop().Sugar()
 	// Uncomment to enable logs
 	// logger := zap.Must(zap.NewProduction()).Sugar()
-	mockStore := store.NewMockStore()
+	mockStore := postgres.NewMockStore()
 	mockCacheStore := cache.NewMockStore()
 
 	testAuth := &auth.TestAuthenticator{}
 
 	// Rate limiter
 	rateLimiter := ratelimiter.NewFixedWindowLimiter(
-		cfg.rateLimiter.RequestPerTimeFrame,
-		cfg.rateLimiter.TimeFrame,
+		cfg.RateLimiter.RequestPerTimeFrame,
+		cfg.RateLimiter.TimeFrame,
 	)
 
-	return &application{
-		logger:        logger,
-		store:         mockStore,
-		cacheStorage:  mockCacheStore,
-		authenticator: testAuth,
-		config:        cfg,
-		rateLimiter:   rateLimiter,
+	return &httpserver.Application{
+		Logger:        logger,
+		Store:         mockStore,
+		CacheStorage:  mockCacheStore,
+		Authenticator: testAuth,
+		Config:        cfg,
+		RateLimiter:   rateLimiter,
 	}
 }
 

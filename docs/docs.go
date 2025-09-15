@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.CreateUserTokenPayload"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.CreateUserTokenPayload"
                         }
                     }
                 ],
@@ -52,7 +52,7 @@ const docTemplate = `{
                     "201": {
                         "description": "JWT token created successfully",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.TokenResponse"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.TokenResponse"
                         }
                     },
                     "400": {
@@ -105,15 +105,15 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.RegisterUserPayload"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.RegisterUserPayload"
                         }
                     }
                 ],
                 "responses": {
-                    "202": {
+                    "201": {
                         "description": "User created successfully, activation required",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.UserWithToken"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.UserWithToken"
                         }
                     },
                     "400": {
@@ -197,7 +197,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.CreatePOstPayload"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.CreatePOstPayload"
                         }
                     }
                 ],
@@ -205,7 +205,122 @@ const docTemplate = `{
                     "200": {
                         "description": "Created post",
                         "schema": {
-                            "$ref": "#/definitions/store.Post"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_posts.Post"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - invalid or missing token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/posts/feed": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a paginated feed of posts from followed users and own posts. Requires JWT authentication.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "feed"
+                ],
+                "summary": "Get user's post feed",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "example": 10,
+                        "description": "Number of posts per page (1-20)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "example": 0,
+                        "description": "Number of posts to skip",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "default": "desc",
+                        "description": "Sort order (asc/desc)",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"golang\"",
+                        "description": "Search in title and content",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"golang,programming\"",
+                        "description": "Comma-separated list of tags",
+                        "name": "tags",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"2024-01-01 00:00:00\"",
+                        "description": "Posts created after this date",
+                        "name": "since",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"2024-12-31 23:59:59\"",
+                        "description": "Posts created before this date",
+                        "name": "until",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User's post feed",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_posts.Feed"
+                            }
                         }
                     },
                     "400": {
@@ -270,7 +385,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Post information with comments",
                         "schema": {
-                            "$ref": "#/definitions/store.Post"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_posts.Post"
                         }
                     },
                     "404": {
@@ -385,7 +500,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.UpdatePostPayload"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_payload.UpdatePostPayload"
                         }
                     }
                 ],
@@ -393,7 +508,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Updated post",
                         "schema": {
-                            "$ref": "#/definitions/store.Post"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_posts.Post"
                         }
                     },
                     "400": {
@@ -459,126 +574,11 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "202": {
                         "description": "User account activated successfully"
                     },
                     "404": {
                         "description": "Token not found or invalid",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/users/feed": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a paginated feed of posts from followed users and own posts. Requires JWT authentication.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "feed"
-                ],
-                "summary": "Get user's post feed",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "example": 10,
-                        "description": "Number of posts per page (1-20)",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 0,
-                        "example": 0,
-                        "description": "Number of posts to skip",
-                        "name": "offset",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "asc",
-                            "desc"
-                        ],
-                        "type": "string",
-                        "default": "desc",
-                        "description": "Sort order (asc/desc)",
-                        "name": "sort",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "\"golang\"",
-                        "description": "Search in title and content",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "\"golang,programming\"",
-                        "description": "Comma-separated list of tags",
-                        "name": "tags",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "\"2024-01-01 00:00:00\"",
-                        "description": "Posts created after this date",
-                        "name": "since",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "\"2024-12-31 23:59:59\"",
-                        "description": "Posts created before this date",
-                        "name": "until",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User's post feed",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/store.Feed"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - invalid or missing token",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -630,7 +630,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User information",
                         "schema": {
-                            "$ref": "#/definitions/store.User"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.User"
                         }
                     },
                     "401": {
@@ -825,7 +825,46 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "cmd_api.CreatePOstPayload": {
+        "github_com_orangeMangoDimz_go-social_internal_entities_comments.Comment": {
+            "description": "Comment on a social media post",
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Comment content",
+                    "type": "string",
+                    "example": "Great post!"
+                },
+                "created_at": {
+                    "description": "Comment creation timestamp",
+                    "type": "string",
+                    "example": "2024-01-01 12:00:00"
+                },
+                "id": {
+                    "description": "Comment ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "post_id": {
+                    "description": "ID of the post this comment belongs to",
+                    "type": "integer",
+                    "example": 123
+                },
+                "user": {
+                    "description": "User who made the comment",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.User"
+                        }
+                    ]
+                },
+                "user_id": {
+                    "description": "ID of the user who made the comment",
+                    "type": "integer",
+                    "example": 456
+                }
+            }
+        },
+        "github_com_orangeMangoDimz_go-social_internal_entities_payload.CreatePOstPayload": {
             "description": "Request payload for creating a new post",
             "type": "object",
             "required": [
@@ -858,8 +897,7 @@ const docTemplate = `{
                 }
             }
         },
-        "cmd_api.CreateUserTokenPayload": {
-            "description": "Request payload for creating a JWT authentication token",
+        "github_com_orangeMangoDimz_go-social_internal_entities_payload.CreateUserTokenPayload": {
             "type": "object",
             "required": [
                 "email",
@@ -881,7 +919,7 @@ const docTemplate = `{
                 }
             }
         },
-        "cmd_api.RegisterUserPayload": {
+        "github_com_orangeMangoDimz_go-social_internal_entities_payload.RegisterUserPayload": {
             "description": "Request payload for user registration",
             "type": "object",
             "required": [
@@ -911,7 +949,7 @@ const docTemplate = `{
                 }
             }
         },
-        "cmd_api.TokenResponse": {
+        "github_com_orangeMangoDimz_go-social_internal_entities_payload.TokenResponse": {
             "description": "Response containing a JWT authentication token",
             "type": "object",
             "properties": {
@@ -922,7 +960,7 @@ const docTemplate = `{
                 }
             }
         },
-        "cmd_api.UpdatePostPayload": {
+        "github_com_orangeMangoDimz_go-social_internal_entities_payload.UpdatePostPayload": {
             "description": "Request payload for updating an existing post",
             "type": "object",
             "properties": {
@@ -940,7 +978,7 @@ const docTemplate = `{
                 }
             }
         },
-        "cmd_api.UserWithToken": {
+        "github_com_orangeMangoDimz_go-social_internal_entities_payload.UserWithToken": {
             "description": "User information with activation token",
             "type": "object",
             "properties": {
@@ -963,7 +1001,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "role": {
-                    "$ref": "#/definitions/store.Role"
+                    "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.Role"
                 },
                 "role_id": {
                     "type": "integer"
@@ -980,46 +1018,7 @@ const docTemplate = `{
                 }
             }
         },
-        "store.Comment": {
-            "description": "Comment on a social media post",
-            "type": "object",
-            "properties": {
-                "content": {
-                    "description": "Comment content",
-                    "type": "string",
-                    "example": "Great post!"
-                },
-                "created_at": {
-                    "description": "Comment creation timestamp",
-                    "type": "string",
-                    "example": "2024-01-01 12:00:00"
-                },
-                "id": {
-                    "description": "Comment ID",
-                    "type": "integer",
-                    "example": 1
-                },
-                "post_id": {
-                    "description": "ID of the post this comment belongs to",
-                    "type": "integer",
-                    "example": 123
-                },
-                "user": {
-                    "description": "User who made the comment",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/store.User"
-                        }
-                    ]
-                },
-                "user_id": {
-                    "description": "ID of the user who made the comment",
-                    "type": "integer",
-                    "example": 456
-                }
-            }
-        },
-        "store.Feed": {
+        "github_com_orangeMangoDimz_go-social_internal_entities_posts.Feed": {
             "description": "Post feed item with comment count",
             "type": "object",
             "properties": {
@@ -1027,7 +1026,7 @@ const docTemplate = `{
                     "description": "Comments on this post",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/store.Comment"
+                        "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_comments.Comment"
                     }
                 },
                 "content": {
@@ -1075,7 +1074,7 @@ const docTemplate = `{
                     "description": "User who created the post",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/store.User"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.User"
                         }
                     ]
                 },
@@ -1091,7 +1090,7 @@ const docTemplate = `{
                 }
             }
         },
-        "store.Post": {
+        "github_com_orangeMangoDimz_go-social_internal_entities_posts.Post": {
             "description": "Social media post with content, tags and metadata",
             "type": "object",
             "properties": {
@@ -1099,7 +1098,7 @@ const docTemplate = `{
                     "description": "Comments on this post",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/store.Comment"
+                        "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_comments.Comment"
                     }
                 },
                 "content": {
@@ -1142,7 +1141,7 @@ const docTemplate = `{
                     "description": "User who created the post",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/store.User"
+                            "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.User"
                         }
                     ]
                 },
@@ -1158,7 +1157,7 @@ const docTemplate = `{
                 }
             }
         },
-        "store.Role": {
+        "github_com_orangeMangoDimz_go-social_internal_entities_users.Role": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1175,7 +1174,7 @@ const docTemplate = `{
                 }
             }
         },
-        "store.User": {
+        "github_com_orangeMangoDimz_go-social_internal_entities_users.User": {
             "description": "User account information",
             "type": "object",
             "properties": {
@@ -1198,7 +1197,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "role": {
-                    "$ref": "#/definitions/store.Role"
+                    "$ref": "#/definitions/github_com_orangeMangoDimz_go-social_internal_entities_users.Role"
                 },
                 "role_id": {
                     "type": "integer"
@@ -1229,12 +1228,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
+	Version:          "1.1.0",
+	Host:             "localhost:8080",
 	BasePath:         "/v1",
 	Schemes:          []string{},
 	Title:            "Gopher Social API",
-	Description:      "",
+	Description:      "A social media API service built with Go featuring user management, posts, comments, and following functionality",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

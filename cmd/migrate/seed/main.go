@@ -5,7 +5,7 @@ import (
 
 	"github.com/orangeMangoDimz/go-social/internal/db"
 	"github.com/orangeMangoDimz/go-social/internal/env"
-	"github.com/orangeMangoDimz/go-social/internal/store"
+	"github.com/orangeMangoDimz/go-social/internal/storage/postgres"
 )
 
 func main() {
@@ -16,6 +16,6 @@ func main() {
 	}
 	defer conn.Close()
 
-	store := store.NewStore(conn)
+	store := postgres.NewStore(conn)
 	db.Seed(store, conn)
 }
