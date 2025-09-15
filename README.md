@@ -189,13 +189,15 @@ go-social/
 
 2. **Set up environment variables**
    ```bash
-   cp .env.example .env
+   touch .envrc
    # Edit .env with your configuration
+   # Then use it
+   source .envrc
    ```
 
-3. **Start dependencies with Docker**
+3. **Run Dev Mode**
    ```bash
-   docker-compose up -d postgres redis
+   air
    ```
 
 4. **Run database migrations**
@@ -216,15 +218,10 @@ go-social/
 ### 🔨 Available Make Commands
 
 ```bash
-make run          # Start the API server
-make build        # Build the application
-make test         # Run all tests
-make test-cover   # Run tests with coverage
-make migrate-up   # Run database migrations
-make migrate-down # Rollback database migrations
-make seed         # Seed database with sample data
-make lint         # Run code linting
-make docker-build # Build Docker image
+make migrate-create <migration_name>      # Generate new migration file (up and down)
+make migrate-up                           # Run database migrations
+make migrate-down                         # Rollback database migrations
+make gen-docs                             # Generate swagger docs
 ```
 
 ## 📚 API Documentation
@@ -301,44 +298,12 @@ Access the full interactive API documentation with request/response examples:
 - Graceful shutdown handling
 - Health check endpoints
 
-## 🧪 Testing
-
-### Running Tests
-
-```bash
-# Run all tests
-make test
-
-# Run tests with coverage
-make test-cover
-
-# Run specific package tests
-go test ./internal/service/...
-
-# Run integration tests
-go test ./cmd/api/...
-```
-
-### Test Structure
-
-```
-- Unit Tests: Test individual components in isolation
-- Integration Tests: Test component interactions
-- API Tests: Test complete HTTP request/response cycles
-- Mock Objects: Isolated testing with dependency injection
-```
 
 ## 🚀 Deployment
 
 ### 🐳 Docker Deployment
 
-```bash
-# Build Docker image
-make docker-build
-
-# Run with Docker Compose
-docker-compose up -d
-```
+Deployed on Cloud Run (google cloud console)
 
 ### 🌐 Production Configuration
 
@@ -346,53 +311,16 @@ Key environment variables for production:
 
 ```env
 ENV=production
-ADDR=:8080
-DB_DSN=postgres://user:pass@localhost/db?sslmode=require
+ADDR=0.0.0.0:8080
+DB_ADDR=postgres://user:pass@localhost/db?sslmode=require
+FROM_EMAIL=hello@demomailtrap.com
+MAILTRAP_API_KEY=mykey
 REDIS_ADDR=localhost:6379
+REDIS_DB=0
+REDIS_ENABLED=false
 JWT_SECRET=your-super-secure-secret
-CORS_ALLOWED_ORIGIN=https://yourdomain.com
 ```
-
-## 🤝 Contributing
-
-### Development Guidelines
-
-1. **Follow Clean Architecture principles**
-2. **Write tests for new features**
-3. **Use conventional commit messages**
-4. **Update documentation for API changes**
-5. **Follow Go best practices and idioms**
-
-### Code Style
-
-- Follow `gofmt` formatting
-- Use meaningful variable and function names
-- Write comprehensive comments for exported functions
-- Keep functions small and focused
-- Use dependency injection for testability
-
-### Pull Request Process
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request with detailed description
-
----
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Support
-
-For support and questions:
-
-- 📧 Email: support@gopher-social.com
-- 🐛 Issues: [GitHub Issues](https://github.com/orangeMangoDimz/go-social/issues)
-- 📖 Documentation: [API Docs](http://localhost:8080/v1/swagger/)
-
----
-
-**Built with ❤️ using Go and Clean Architecture principles**
