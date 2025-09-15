@@ -1,5 +1,7 @@
 # 🚀 Gopher Social API
 
+**NOTE**: This project is for learning purposes only
+
 A modern social media API built with Go, implementing **Clean Architecture** principles and **Domain-Driven Design (DDD)** patterns. This REST API provides comprehensive functionality for user management, posts, comments, and social interactions.
 
 ## 📋 Table of Contents
