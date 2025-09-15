@@ -3,7 +3,6 @@ package postsHandler
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -136,7 +135,6 @@ func (h *httpHandler) getPostHandler(w http.ResponseWriter, r *http.Request) {
 //	@Failure		500		{object}	map[string]string													"Internal server error"
 //	@Router			/posts/feed [get]
 func (h *httpHandler) getUserPostFeed(w http.ResponseWriter, r *http.Request) {
-	fmt.Print("test")
 	fq := pagination.PaginatedQuery{
 		Limit:  20,
 		Offset: 0,
@@ -144,7 +142,6 @@ func (h *httpHandler) getUserPostFeed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fq, err := fq.Parse(r)
-	fmt.Print("err: ", err)
 	if err != nil {
 		protocol.BadRequestResponse(w, r, err)
 		return
@@ -158,7 +155,6 @@ func (h *httpHandler) getUserPostFeed(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := protocol.GetUserFromContext(r)
-	fmt.Print("USER ID: ", user.ID)
 
 	userID := user.ID
 	feed, err := h.PostService.GetUserFeed(ctx, int64(userID), fq)

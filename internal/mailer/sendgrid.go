@@ -56,7 +56,7 @@ func (m *SendGridMailer) Send(templateFile, username, email string, data any, is
 	})
 
 	var retryErr error
-	for i := 0; i < maxRetires; i++ {
+	for i := 0; i < maxRetries; i++ {
 		response, retryErr := m.client.Send(message)
 		if retryErr != nil {
 			// exponential backoff
@@ -67,5 +67,5 @@ func (m *SendGridMailer) Send(templateFile, username, email string, data any, is
 		return response.StatusCode, nil
 	}
 
-	return -1, fmt.Errorf("failed to send email after %d attempt, error: %v", maxRetires, retryErr)
+	return -1, fmt.Errorf("failed to send email after %d attempt, error: %v", maxRetries, retryErr)
 }
